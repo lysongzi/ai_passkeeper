@@ -19,6 +19,7 @@
 "category.finance" = "Finance";
 "category.shopping" = "Shopping";
 "category.entertainment" = "Entertainment";
+"category.other" = "Other";
 
 /* Content View (Auth) */
 "auth.unlock" = "Unlock";
@@ -44,6 +45,7 @@
 "detail.deleteWarning" = "This action cannot be undone.";
 "detail.username" = "Username";
 "detail.copied" = "Copied!";
+"detail.edit" = "Edit";
 
 /* Add/Edit Password */
 "addEdit.title" = "Details";

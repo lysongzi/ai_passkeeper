@@ -45,6 +45,7 @@
 "detail.deleteWarning" = "此操作无法撤销";
 "detail.username" = "用户名";
 "detail.copied" = "已复制！";
+"detail.edit" = "编辑";
 
 /* Add/Edit Password */
 "addEdit.title" = "密码详情";

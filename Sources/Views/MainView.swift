@@ -26,6 +26,10 @@ struct MainView: View {
                         await listViewModel.deletePassword(selected)
                         selectedPasswordId = nil
                     }
+                }, onSave: {
+                    Task {
+                        await listViewModel.loadPasswords()
+                    }
                 })
             } else {
                 EmptyStateView(onAddNew: { showingAddSheet = true })
