@@ -101,6 +101,7 @@ struct AddEditPasswordView: View {
                             Text(category.localized).tag(category)
                         }
                     }
+                    .pickerStyle(.menu)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                     TextEditor(text: $viewModel.notes)
