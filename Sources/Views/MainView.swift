@@ -21,7 +21,7 @@ struct MainView: View {
         } detail: {
             if let selectedId = selectedPasswordId,
                let selected = listViewModel.passwords.first(where: { $0.id == selectedId }) {
-                PasswordDetailView(item: selected, onDelete: {
+                PasswordDetailViewNew(item: selected, onDelete: {
                     Task {
                         await listViewModel.deletePassword(selected)
                         selectedPasswordId = nil
@@ -60,10 +60,10 @@ struct MainView: View {
             }
         }
         .sheet(isPresented: $showingSettings) {
-            SettingsView()
+            SettingsViewNew()
         }
         .sheet(isPresented: $showingAddSheet) {
-            AddEditPasswordView(onSave: {
+            AddEditPasswordViewNew(onSave: {
                 Task {
                     await listViewModel.loadPasswords()
                 }
