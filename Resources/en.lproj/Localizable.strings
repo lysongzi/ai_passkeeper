@@ -80,3 +80,14 @@
 /* Menu */
 "menu.newPassword" = "New Password";
 "menu.lockVault" = "Lock Vault";
+
+/* Common */
+"common.cancel" = "Cancel";
+"common.save" = "Save";
+"common.copied" = "Copied!";
+
+/* Settings */
+"settings.cancel" = "Cancel";
+
+/* Add/Edit */
+"addEdit.details" = "Details";

@@ -80,3 +80,14 @@
 /* Menu */
 "menu.newPassword" = "新建密码";
 "menu.lockVault" = "锁定保险库";
+
+/* Common */
+"common.cancel" = "取消";
+"common.save" = "保存";
+"common.copied" = "已复制！";
+
+/* Settings */
+"settings.cancel" = "取消";
+
+/* Add/Edit */
+"addEdit.details" = "详情";

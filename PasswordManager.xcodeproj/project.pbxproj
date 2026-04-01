@@ -7,21 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		007BB375781AC5352E535D93 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3BAB29A7E749DBD6FE2C2D15 /* Localizable.strings */; };
+		0093B9DA7B08007D110FC904 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338D2B260D6338848C8EA719 /* MainContentView.swift */; };
+		0A2F0CD4CF4AEF384F7E412B /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DE621269BBF2F80B3FBCF18 /* Theme.swift */; };
 		114CAA1F5FFD733DE121BF7B /* AuthenticationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F02FDD4E5CCC7282A481DFF /* AuthenticationViewModel.swift */; };
 		21F13D8D8166AAB8B2942C6B /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD9298A76677B332B176B6FC /* MainView.swift */; };
 		22196189FC1EFBA785DC9763 /* SecurityServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00C24B311AE61EB030230D5 /* SecurityServiceTests.swift */; };
-		2BC6314A2F7180CA00246DCA /* I18nService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC631492F7180CA00246DCA /* I18nService.swift */; };
-		2BC6314B2F7180CA00246DCA /* I18nService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC631492F7180CA00246DCA /* I18nService.swift */; };
-		2BC6314D2F7180F100246DCA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6314C2F7180F100246DCA /* SettingsView.swift */; };
-		2BC6314E2F7180F100246DCA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6314C2F7180F100246DCA /* SettingsView.swift */; };
-		2BC631502F71810500246DCA /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6314F2F71810500246DCA /* SettingsViewModel.swift */; };
-		2BC631512F71810500246DCA /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC6314F2F71810500246DCA /* SettingsViewModel.swift */; };
-		35FAD60B456A98ED7FAB9E00 /* PasswordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF73CE9DA8927505369D74D7 /* PasswordDetailView.swift */; };
+		298EED68E1047ED1AE7F20CE /* I18nService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845A20E7062F7107EFFC8C1B /* I18nService.swift */; };
 		3721CF88B22855AEEC48DD05 /* PasswordListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAA16DC7EAB221E4B14F43B /* PasswordListViewModel.swift */; };
+		6591F2E46E491422362197C4 /* AddEditPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B76E4C04EFDDC65BD7B8D6 /* AddEditPasswordView.swift */; };
 		65BE05EC905C50C77DED4DDF /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0068C58E64A7FBE839391D /* DatabaseManager.swift */; };
+		65C4A4F720AFA387CDC8F7F1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8E8660C02666C3D4886103 /* SettingsView.swift */; };
 		69DD9E9C9206466A43E2909B /* PasswordRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7BC5E8FC52D39D020C0E5F2 /* PasswordRepository.swift */; };
+		733D1AF8458D73291304E109 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360B1F38CC4C92FBF7C25D03 /* ThemeManager.swift */; };
 		7405E2581A219A9B5F01E40D /* PassKeeperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596BD74A642A0347009E81D4 /* PassKeeperTests.swift */; };
-		77DBE439E727CE4D1E3EF9D6 /* AddEditPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF46CDA352DA8A78A1C33A68 /* AddEditPasswordView.swift */; };
 		8044751185D4A49AF3DE835F /* PassKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B06D0355EFC99E0FB83DB6 /* PassKeeperApp.swift */; };
 		837A0D40A43FE53640D99C60 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E9231745378FB6CE7028F6 /* KeychainService.swift */; };
 		848AEEE90EDB8E2A9607C0BA /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38900A0D19C38AEAD3280B6 /* AppState.swift */; };
@@ -29,12 +28,15 @@
 		A6FE830449C05D897FCA0E90 /* AddEditPasswordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48C1987E05A1B4AEA9B41708 /* AddEditPasswordViewModel.swift */; };
 		B04A21E380BD12059F1F68C3 /* SecureClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F979AC5E6891A0767AACA31B /* SecureClipboardManager.swift */; };
 		B98ED59027F45B46B1FF96C9 /* PasswordItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1DFEA22DC7CCB82D7A766C /* PasswordItem.swift */; };
+		BA71EDF99C674BB5B6814CA8 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8972EECB55F714EDF258A34 /* SidebarView.swift */; };
 		C5D9F1B460847243AE3F2005 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB746B3B52549F3CC8280192 /* ContentView.swift */; };
+		CC9768E020044361BABC0733 /* PasswordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260511A9E3D9C35512E139C9 /* PasswordDetailView.swift */; };
+		D314EADE0DE290754871EEAD /* UnlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB62C16782E5F16E2CE87208 /* UnlockView.swift */; };
 		D4AE598FA055075A1E3B3144 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8D7EABC98CB02307F8329864 /* Assets.xcassets */; };
+		D7CF2CE8AD8EF9CC96A686D8 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96BC182A71C5728862231D49 /* SettingsViewModel.swift */; };
 		DB11547BDE9B71905AD296F1 /* SecurityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67F022A33075986590301572 /* SecurityService.swift */; };
+		DF1D59BB3D72033C312C6D4E /* CommonComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09242D7336DA0D07E26215C9 /* CommonComponents.swift */; };
 		FBCA490D14501D8DD6DBB6DB /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 633A0A9A36A5BC5F5A170E3F /* SQLite */; };
-		L20000000000000000000001 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = L10000000000000000000001 /* en.lproj */; };
-		L20000000000000000000002 /* zh-Hans.lproj in Resources */ = {isa = PBXBuildFile; fileRef = L10000000000000000000002 /* zh-Hans.lproj */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,34 +50,40 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		09242D7336DA0D07E26215C9 /* CommonComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonComponents.swift; sourceTree = "<group>"; };
+		0A5E029D5D843C3C7ED1D339 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		0D8E8660C02666C3D4886103 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		23BDC62C554E8FB36B57C52F /* PasswordManagerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PasswordManagerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2BC631492F7180CA00246DCA /* I18nService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = I18nService.swift; sourceTree = "<group>"; };
-		2BC6314C2F7180F100246DCA /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		2BC6314F2F71810500246DCA /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		260511A9E3D9C35512E139C9 /* PasswordDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordDetailView.swift; sourceTree = "<group>"; };
 		2F02FDD4E5CCC7282A481DFF /* AuthenticationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationViewModel.swift; sourceTree = "<group>"; };
+		338D2B260D6338848C8EA719 /* MainContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
+		360B1F38CC4C92FBF7C25D03 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		42A49BC759AFA3D2B485FDC6 /* PassKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PassKeeper.entitlements; sourceTree = "<group>"; };
 		48C1987E05A1B4AEA9B41708 /* AddEditPasswordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditPasswordViewModel.swift; sourceTree = "<group>"; };
 		48E9231745378FB6CE7028F6 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		4DE621269BBF2F80B3FBCF18 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		4EAA16DC7EAB221E4B14F43B /* PasswordListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordListViewModel.swift; sourceTree = "<group>"; };
 		596BD74A642A0347009E81D4 /* PassKeeperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassKeeperTests.swift; sourceTree = "<group>"; };
-		5A87C4CD8E25AEC6CFA87C0A /* PasswordManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = PasswordManager.app; path = PassKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A87C4CD8E25AEC6CFA87C0A /* PasswordManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PasswordManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		67F022A33075986590301572 /* SecurityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityService.swift; sourceTree = "<group>"; };
+		845A20E7062F7107EFFC8C1B /* I18nService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = I18nService.swift; sourceTree = "<group>"; };
+		8CDF225D7492BE361B6AB04A /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		8D7EABC98CB02307F8329864 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		L10000000000000000000001 /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = en.lproj; sourceTree = "<group>"; };
-		L10000000000000000000002 /* zh-Hans.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = zh-Hans.lproj; sourceTree = "<group>"; };
+		96BC182A71C5728862231D49 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		9C0068C58E64A7FBE839391D /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		AA4F53E87958EF680F39E341 /* LocalAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAuthService.swift; sourceTree = "<group>"; };
 		AB746B3B52549F3CC8280192 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		AF73CE9DA8927505369D74D7 /* PasswordDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordDetailView.swift; sourceTree = "<group>"; };
+		B2B76E4C04EFDDC65BD7B8D6 /* AddEditPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditPasswordView.swift; sourceTree = "<group>"; };
 		BD9298A76677B332B176B6FC /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		C00C24B311AE61EB030230D5 /* SecurityServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityServiceTests.swift; sourceTree = "<group>"; };
+		C8972EECB55F714EDF258A34 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		D7BC5E8FC52D39D020C0E5F2 /* PasswordRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordRepository.swift; sourceTree = "<group>"; };
 		E2C4A2619DE58287F1C14C63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E38900A0D19C38AEAD3280B6 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		E8B06D0355EFC99E0FB83DB6 /* PassKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassKeeperApp.swift; sourceTree = "<group>"; };
 		F979AC5E6891A0767AACA31B /* SecureClipboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureClipboardManager.swift; sourceTree = "<group>"; };
 		FA1DFEA22DC7CCB82D7A766C /* PasswordItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordItem.swift; sourceTree = "<group>"; };
-		FF46CDA352DA8A78A1C33A68 /* AddEditPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditPasswordView.swift; sourceTree = "<group>"; };
+		FB62C16782E5F16E2CE87208 /* UnlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,11 +101,9 @@
 		0B7F0804FB30346BF44F0EBC /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				2BC6314C2F7180F100246DCA /* SettingsView.swift */,
-				FF46CDA352DA8A78A1C33A68 /* AddEditPasswordView.swift */,
 				AB746B3B52549F3CC8280192 /* ContentView.swift */,
 				BD9298A76677B332B176B6FC /* MainView.swift */,
-				AF73CE9DA8927505369D74D7 /* PasswordDetailView.swift */,
+				C64278C85E49F946B11F71E2 /* Components */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -106,10 +112,9 @@
 			isa = PBXGroup;
 			children = (
 				8D7EABC98CB02307F8329864 /* Assets.xcassets */,
-				L10000000000000000000001 /* en.lproj */,
-				L10000000000000000000002 /* zh-Hans.lproj */,
 				E2C4A2619DE58287F1C14C63 /* Info.plist */,
 				42A49BC759AFA3D2B485FDC6 /* PassKeeper.entitlements */,
+				3BAB29A7E749DBD6FE2C2D15 /* Localizable.strings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -158,10 +163,10 @@
 		743D34FE64FF476F1B03B55B /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				2BC6314F2F71810500246DCA /* SettingsViewModel.swift */,
 				48C1987E05A1B4AEA9B41708 /* AddEditPasswordViewModel.swift */,
 				2F02FDD4E5CCC7282A481DFF /* AuthenticationViewModel.swift */,
 				4EAA16DC7EAB221E4B14F43B /* PasswordListViewModel.swift */,
+				96BC182A71C5728862231D49 /* SettingsViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -185,6 +190,22 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		C64278C85E49F946B11F71E2 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				B2B76E4C04EFDDC65BD7B8D6 /* AddEditPasswordView.swift */,
+				09242D7336DA0D07E26215C9 /* CommonComponents.swift */,
+				338D2B260D6338848C8EA719 /* MainContentView.swift */,
+				260511A9E3D9C35512E139C9 /* PasswordDetailView.swift */,
+				0D8E8660C02666C3D4886103 /* SettingsView.swift */,
+				C8972EECB55F714EDF258A34 /* SidebarView.swift */,
+				4DE621269BBF2F80B3FBCF18 /* Theme.swift */,
+				360B1F38CC4C92FBF7C25D03 /* ThemeManager.swift */,
+				FB62C16782E5F16E2CE87208 /* UnlockView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 		C675582790717EAE732E8FE8 /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -196,7 +217,7 @@
 		D6FAA01551D9F17C6552A9AB /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				2BC631492F7180CA00246DCA /* I18nService.swift */,
+				845A20E7062F7107EFFC8C1B /* I18nService.swift */,
 				83D841F2936812A9F1258544 /* Security */,
 				6CC37252B984CFFB38B77E44 /* Storage */,
 			);
@@ -286,11 +307,12 @@
 			knownRegions = (
 				Base,
 				en,
+				"zh-Hans",
 			);
 			mainGroup = 461F8B8377C89D3D9EA9BBA8;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				11540019E5A6F602CC6FCB5B /* XCRemoteSwiftPackageReference "SQLite" */,
+				11540019E5A6F602CC6FCB5B /* XCRemoteSwiftPackageReference "SQLite.swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AC2A8AFE363C69EB9C9F94F1 /* Products */;
@@ -309,8 +331,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4AE598FA055075A1E3B3144 /* Assets.xcassets in Resources */,
-				L20000000000000000000001 /* en.lproj in Resources */,
-				L20000000000000000000002 /* zh-Hans.lproj in Resources */,
+				007BB375781AC5352E535D93 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -321,25 +342,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2BC6314B2F7180CA00246DCA /* I18nService.swift in Sources */,
-				77DBE439E727CE4D1E3EF9D6 /* AddEditPasswordView.swift in Sources */,
+				6591F2E46E491422362197C4 /* AddEditPasswordView.swift in Sources */,
 				A6FE830449C05D897FCA0E90 /* AddEditPasswordViewModel.swift in Sources */,
-				2BC6314D2F7180F100246DCA /* SettingsView.swift in Sources */,
 				848AEEE90EDB8E2A9607C0BA /* AppState.swift in Sources */,
-				2BC631512F71810500246DCA /* SettingsViewModel.swift in Sources */,
 				114CAA1F5FFD733DE121BF7B /* AuthenticationViewModel.swift in Sources */,
+				DF1D59BB3D72033C312C6D4E /* CommonComponents.swift in Sources */,
 				C5D9F1B460847243AE3F2005 /* ContentView.swift in Sources */,
 				65BE05EC905C50C77DED4DDF /* DatabaseManager.swift in Sources */,
+				298EED68E1047ED1AE7F20CE /* I18nService.swift in Sources */,
 				837A0D40A43FE53640D99C60 /* KeychainService.swift in Sources */,
 				8E0E738029925A2A0507E141 /* LocalAuthService.swift in Sources */,
+				0093B9DA7B08007D110FC904 /* MainContentView.swift in Sources */,
 				21F13D8D8166AAB8B2942C6B /* MainView.swift in Sources */,
 				8044751185D4A49AF3DE835F /* PassKeeperApp.swift in Sources */,
-				35FAD60B456A98ED7FAB9E00 /* PasswordDetailView.swift in Sources */,
+				CC9768E020044361BABC0733 /* PasswordDetailView.swift in Sources */,
 				B98ED59027F45B46B1FF96C9 /* PasswordItem.swift in Sources */,
 				3721CF88B22855AEEC48DD05 /* PasswordListViewModel.swift in Sources */,
 				69DD9E9C9206466A43E2909B /* PasswordRepository.swift in Sources */,
 				B04A21E380BD12059F1F68C3 /* SecureClipboardManager.swift in Sources */,
 				DB11547BDE9B71905AD296F1 /* SecurityService.swift in Sources */,
+				65C4A4F720AFA387CDC8F7F1 /* SettingsView.swift in Sources */,
+				D7CF2CE8AD8EF9CC96A686D8 /* SettingsViewModel.swift in Sources */,
+				BA71EDF99C674BB5B6814CA8 /* SidebarView.swift in Sources */,
+				0A2F0CD4CF4AEF384F7E412B /* Theme.swift in Sources */,
+				733D1AF8458D73291304E109 /* ThemeManager.swift in Sources */,
+				D314EADE0DE290754871EEAD /* UnlockView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -361,6 +388,18 @@
 			targetProxy = F6904521192B7B866B2F500E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		3BAB29A7E749DBD6FE2C2D15 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0A5E029D5D843C3C7ED1D339 /* en */,
+				8CDF225D7492BE361B6AB04A /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		02DAD4BCBE989F23EB4CCE84 /* Release */ = {
@@ -593,7 +632,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		11540019E5A6F602CC6FCB5B /* XCRemoteSwiftPackageReference "SQLite" */ = {
+		11540019E5A6F602CC6FCB5B /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
 			requirement = {
@@ -606,7 +645,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		633A0A9A36A5BC5F5A170E3F /* SQLite */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 11540019E5A6F602CC6FCB5B /* XCRemoteSwiftPackageReference "SQLite" */;
+			package = 11540019E5A6F602CC6FCB5B /* XCRemoteSwiftPackageReference "SQLite.swift" */;
 			productName = SQLite;
 		};
 /* End XCSwiftPackageProductDependency section */
