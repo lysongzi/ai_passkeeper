@@ -133,8 +133,11 @@ struct AppConstants {
     /// Large corner radius (10px)
     static let radiusLg: CGFloat = 10
 
-    /// Extra large corner radius (14px)
-    static let radiusXl: CGFloat = 14
+    /// Extra large corner radius (16px for inputs)
+    static let radiusXl: CGFloat = 16
+
+    /// 2xl corner radius (20px for cards/modals)
+    static let radiusXxl: CGFloat = 20
 
     // MARK: - Sizing
 
@@ -197,7 +200,7 @@ extension Color {
 
 // MARK: - View Modifiers
 
-/// Primary button style
+/// Primary button style - matches prototype with shadow
 struct PrimaryButtonStyle: ButtonStyle {
     var isEnabled: Bool = true
 
@@ -207,13 +210,15 @@ struct PrimaryButtonStyle: ButtonStyle {
             .foregroundColor(AppColors.primaryForeground)
             .frame(height: AppConstants.buttonHeight)
             .frame(maxWidth: .infinity)
+            .padding(.horizontal, 16)
             .background(isEnabled ? AppColors.primary : AppColors.muted)
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
-            .opacity(configuration.isPressed ? 0.8 : 1.0)
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
+            .shadow(color: isEnabled ? Color.black.opacity(0.15) : Color.clear, radius: 4, x: 0, y: 2)
+            .opacity(configuration.isPressed ? 0.9 : 1.0)
     }
 }
 
-/// Secondary button style
+/// Secondary button style - matches prototype
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -221,9 +226,11 @@ struct SecondaryButtonStyle: ButtonStyle {
             .foregroundColor(AppColors.foreground)
             .frame(height: AppConstants.buttonHeight)
             .frame(maxWidth: .infinity)
+            .padding(.horizontal, 16)
             .background(AppColors.secondary)
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
-            .opacity(configuration.isPressed ? 0.8 : 1.0)
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
+            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
+            .opacity(configuration.isPressed ? 0.9 : 1.0)
     }
 }
 

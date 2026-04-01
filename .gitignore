@@ -14,3 +14,7 @@ xcuserdata/
 # CocoaPods
 Pods/
 Podfile.lock
+
+# Prototype & Design
+RedesignUI/
+prototype-screenshots/

@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Main Content Area
 
-/// Redesigned main content area with toolbar
+/// Redesigned main content area with toolbar - matches prototype
 struct MainContentView: View {
     @ObservedObject var viewModel: PasswordListViewModel
     @Binding var selectedPasswordId: UUID?
@@ -12,43 +12,58 @@ struct MainContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Toolbar
+            // Toolbar - matches prototype styling
             HStack(spacing: 12) {
-                // Add password button
+                // Add password button - matches prototype
                 Button(action: onAddNew) {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         Image(systemName: "plus")
                         Text("main.addPassword".localized)
                     }
                     .font(.subheadline)
                     .fontWeight(.medium)
+                    .foregroundColor(AppColors.primaryForeground)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(AppColors.primary)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
                 }
-                .buttonStyle(PrimaryButtonStyle())
+                .buttonStyle(.plain)
 
-                // Settings button
+                // Settings button - matches prototype
                 Button(action: onSettings) {
                     Image(systemName: "gearshape")
                         .font(.system(size: AppConstants.iconSizeMd))
+                        .foregroundColor(AppColors.foreground)
+                        .frame(width: 36, height: 36)
+                        .background(AppColors.accent)
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
                 }
-                .buttonStyle(SecondaryButtonStyle())
+                .buttonStyle(.plain)
 
-                // Lock button
+                // Lock button - matches prototype
                 Button(action: onLock) {
                     Image(systemName: "lock")
                         .font(.system(size: AppConstants.iconSizeMd))
+                        .foregroundColor(AppColors.foreground)
+                        .frame(width: 36, height: 36)
+                        .background(AppColors.accent)
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
                 }
-                .buttonStyle(SecondaryButtonStyle())
+                .buttonStyle(.plain)
 
                 Spacer()
 
-                // Theme toggle button
+                // Theme toggle button - matches prototype
                 ThemeToggleButton()
             }
-            .padding(16)
+            .padding(12)
+            .background(AppColors.card)
 
             Divider()
 
-            // Content area
+            // Content area - matches prototype
             if let selectedId = selectedPasswordId,
                let selected = viewModel.passwords.first(where: { $0.id == selectedId }) {
                 PasswordDetailViewNew(
@@ -76,13 +91,13 @@ struct MainContentView: View {
 
 // MARK: - Empty State New
 
-/// Redesigned empty state with key icon
+/// Redesigned empty state with key icon - matches prototype
 struct EmptyStateViewNew: View {
     let onAddNew: () -> Void
 
     var body: some View {
         VStack(spacing: 20) {
-            // Key icon with gradient
+            // Key icon with gradient - matches prototype
             ZStack {
                 Circle()
                     .fill(
@@ -92,7 +107,7 @@ struct EmptyStateViewNew: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 100, height: 100)
+                    .frame(width: 96, height: 96)
 
                 GradientIcon(systemName: "key.fill", size: 40)
             }
@@ -109,6 +124,7 @@ struct EmptyStateViewNew: View {
                     .multilineTextAlignment(.center)
             }
 
+            // Add button - matches prototype styling
             Button {
                 onAddNew()
             } label: {
@@ -116,8 +132,15 @@ struct EmptyStateViewNew: View {
                     Image(systemName: "plus")
                     Text("main.addNewPassword".localized)
                 }
+                .font(.headline)
+                .foregroundColor(AppColors.primaryForeground)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(AppColors.primary)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
             }
-            .buttonStyle(PrimaryButtonStyle())
+            .buttonStyle(.plain)
             .frame(width: 200)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -3,7 +3,7 @@ import AppKit
 
 // MARK: - Password Detail View New
 
-/// Redesigned detail view for a password entry with shadcn/ui styling
+/// Redesigned detail view for a password entry with shadcn/ui styling - matches prototype
 struct PasswordDetailViewNew: View {
     let item: DecryptedPasswordItem
     let onDelete: () -> Void
@@ -35,12 +35,18 @@ struct PasswordDetailViewNew: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 headerSection
+
                 Divider()
                     .padding(.horizontal, 16)
+
                 usernameSection
+
                 passwordSection
+
                 categorySection
+
                 notesSection
+
                 metadataSection
 
                 Spacer()
@@ -68,7 +74,7 @@ struct PasswordDetailViewNew: View {
     @ViewBuilder
     private var headerSection: some View {
         HStack(alignment: .center, spacing: 16) {
-            // Gradient icon
+            // Gradient icon - matches prototype
             ZStack {
                 RoundedRectangle(cornerRadius: AppConstants.radiusLg)
                     .fill(
@@ -78,7 +84,7 @@ struct PasswordDetailViewNew: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 60, height: 60)
+                    .frame(width: 64, height: 64)
 
                 GradientIcon(systemName: "key.fill", size: 28)
             }
@@ -194,7 +200,7 @@ struct PasswordDetailViewNew: View {
 
             HStack(spacing: 12) {
                 if isEditing {
-                    // Edit mode
+                    // Edit mode - matches prototype
                     Group {
                         if showEditedPassword {
                             TextField("detail.password".localized, text: $editedPassword)
@@ -214,7 +220,7 @@ struct PasswordDetailViewNew: View {
 
                     TogglePasswordButton(isSecure: $showEditedPassword)
                 } else {
-                    // Display mode
+                    // Display mode - matches prototype
                     Group {
                         if showPassword {
                             Text(item.password)
@@ -236,10 +242,11 @@ struct PasswordDetailViewNew: View {
                 }
             }
 
-            if let feedback = copyFeedback {
-                Text(feedback)
+            if !isEditing {
+                Text("common.copied".localized)
                     .font(.caption)
                     .foregroundColor(.green)
+                    .opacity(copyFeedback != nil ? 1 : 0)
             }
         }
         .padding(.horizontal, 16)
@@ -348,21 +355,29 @@ struct PasswordDetailViewNew: View {
                 .fontWeight(.medium)
                 .foregroundColor(AppColors.mutedForeground)
 
-            HStack {
-                Text("detail.created".localized)
-                    .foregroundColor(AppColors.mutedForeground)
-                Text(item.createdAt, style: .date)
-                    .foregroundColor(AppColors.foreground)
-            }
-            .font(.caption)
+            // Metadata display - inline implementation
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("detail.created".localized)
+                        .foregroundColor(AppColors.mutedForeground)
+                    Spacer()
+                    Text(item.createdAt.formatted(date: .abbreviated, time: .omitted))
+                        .foregroundColor(AppColors.foreground)
+                }
+                .font(.caption)
 
-            HStack {
-                Text("detail.lastModified".localized)
-                    .foregroundColor(AppColors.mutedForeground)
-                Text(item.updatedAt, style: .date)
-                    .foregroundColor(AppColors.foreground)
+                HStack {
+                    Text("detail.lastModified".localized)
+                        .foregroundColor(AppColors.mutedForeground)
+                    Spacer()
+                    Text(item.updatedAt.formatted(date: .abbreviated, time: .omitted))
+                        .foregroundColor(AppColors.foreground)
+                }
+                .font(.caption)
             }
-            .font(.caption)
+            .padding(12)
+            .background(AppColors.inputBackground)
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
         }
         .padding(.horizontal, 16)
     }

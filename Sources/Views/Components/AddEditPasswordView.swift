@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Add/Edit Password Modal New
 
-/// Redesigned modal for adding or editing a password entry
+/// Redesigned modal for adding or editing a password entry - matches prototype
 struct AddEditPasswordViewNew: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = AddEditPasswordViewModel()
@@ -17,41 +17,50 @@ struct AddEditPasswordViewNew: View {
 
     var body: some View {
         ZStack {
-            // Semi-transparent background
-            Color.black.opacity(0.4)
+            // Semi-transparent background - matches prototype
+            Color.black.opacity(0.5)
                 .ignoresSafeArea()
                 .onTapGesture {
                     dismiss()
                 }
 
-            // Modal container
+            // Modal container - matches prototype styling
             VStack(spacing: 0) {
-                // Header
+                // Header - matches prototype
                 headerView
-                    .padding(16)
 
                 Divider()
 
-                // Form
+                // Form - matches prototype
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Title field
-                        FormField(
+                        // Section title
+                        Text("addEdit.details".localized)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(AppColors.mutedForeground)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 16)
+
+                        // Title field - matches prototype (right-aligned label)
+                        FormFieldRightLabel(
                             label: "addEdit.titleField".localized,
                             placeholder: "addEdit.titleField".localized,
                             text: $viewModel.title,
                             icon: "textformat"
                         )
+                        .padding(.horizontal, 16)
 
-                        // Username field
-                        FormField(
+                        // Username field - matches prototype
+                        FormFieldRightLabel(
                             label: "addEdit.username".localized,
                             placeholder: "addEdit.username".localized,
                             text: $viewModel.username,
                             icon: "person"
                         )
+                        .padding(.horizontal, 16)
 
-                        // Password field
+                        // Password field - matches prototype
                         VStack(alignment: .leading, spacing: 8) {
                             Text("detail.password".localized)
                                 .font(.subheadline)
@@ -73,14 +82,15 @@ struct AddEditPasswordViewNew: View {
                             .padding(.vertical, 14)
                             .frame(height: AppConstants.inputHeight)
                             .background(AppColors.inputBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
                             .overlay(
-                                RoundedRectangle(cornerRadius: AppConstants.radiusXl)
+                                RoundedRectangle(cornerRadius: 16)
                                     .stroke(AppColors.border, lineWidth: 1)
                             )
                         }
+                        .padding(.horizontal, 16)
 
-                        // Category picker
+                        // Category picker - matches prototype
                         VStack(alignment: .leading, spacing: 8) {
                             Text("addEdit.category".localized)
                                 .font(.subheadline)
@@ -112,16 +122,17 @@ struct AddEditPasswordViewNew: View {
                                 .padding(.horizontal, 16)
                                 .frame(height: AppConstants.inputHeight)
                                 .background(AppColors.inputBackground)
-                                .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
                             }
                             .menuStyle(.borderlessButton)
                             .overlay(
-                                RoundedRectangle(cornerRadius: AppConstants.radiusXl)
+                                RoundedRectangle(cornerRadius: 16)
                                     .stroke(AppColors.border, lineWidth: 1)
                             )
                         }
+                        .padding(.horizontal, 16)
 
-                        // Notes field
+                        // Notes field - matches prototype
                         VStack(alignment: .leading, spacing: 8) {
                             Text("detail.notes".localized)
                                 .font(.subheadline)
@@ -134,19 +145,20 @@ struct AddEditPasswordViewNew: View {
                                 .scrollContentBackground(.hidden)
                                 .padding(12)
                                 .background(AppColors.inputBackground)
-                                .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: AppConstants.radiusXl)
+                                    RoundedRectangle(cornerRadius: 16)
                                         .stroke(AppColors.border, lineWidth: 1)
                                 )
                         }
+                        .padding(.horizontal, 16)
                     }
-                    .padding(16)
+                    .padding(.vertical, 16)
                 }
             }
-            .frame(width: 480, height: 600)
+            .frame(width: 520, height: 640)
             .background(AppColors.popover)
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
             .shadow(color: Color.black.opacity(0.2), radius: 20)
         }
     }
@@ -161,10 +173,14 @@ struct AddEditPasswordViewNew: View {
             }
             .buttonStyle(.plain)
             .foregroundColor(AppColors.mutedForeground)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(AppColors.accent)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
 
             Spacer()
 
-            Text(viewModel.isEditing ? "main.addPassword".localized : "main.addNewPassword".localized)
+            Text(editingItem == nil ? "main.addNewPassword".localized : "main.addPassword".localized)
                 .font(.headline)
                 .foregroundColor(AppColors.foreground)
 
@@ -178,9 +194,14 @@ struct AddEditPasswordViewNew: View {
                     }
                 }
             }
-            .buttonStyle(PrimaryButtonStyle())
-            .frame(width: 80)
+            .font(.headline)
+            .foregroundColor(AppColors.primaryForeground)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+            .background(viewModel.isValid ? AppColors.primary : AppColors.muted)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
             .disabled(!viewModel.isValid || viewModel.isSaving)
         }
+        .padding(16)
     }
 }

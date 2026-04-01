@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Redesigned Sidebar View
 
-/// Redesigned sidebar with shadcn/ui styling
+/// Redesigned sidebar with shadcn/ui styling - matches prototype
 struct SidebarViewNew: View {
     @ObservedObject var viewModel: PasswordListViewModel
     @Binding var selectedPasswordId: UUID?
@@ -10,16 +10,16 @@ struct SidebarViewNew: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Search
+            // Search - matches prototype
             StyledTextField(
                 placeholder: "main.search".localized,
                 text: $viewModel.searchText,
                 icon: "magnifyingglass"
             )
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 12)
             .padding(.vertical, 12)
 
-            // Password list
+            // Password list - matches prototype
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0) {
                     ForEach(viewModel.passwords, id: \.id) { item in
@@ -36,9 +36,9 @@ struct SidebarViewNew: View {
             .frame(maxHeight: .infinity)
 
             Divider()
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 12)
 
-            // Category filter
+            // Category filter - matches prototype
             VStack(alignment: .leading, spacing: 4) {
                 Text("main.categories".localized)
                     .font(.caption)
@@ -62,10 +62,10 @@ struct SidebarViewNew: View {
             }
 
             Divider()
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 12)
                 .padding(.top, 8)
 
-            // Settings button
+            // Settings button - matches prototype
             Button {
                 showingSettings = true
             } label: {
@@ -83,7 +83,7 @@ struct SidebarViewNew: View {
                 .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
             }
             .buttonStyle(.plain)
-            .padding(16)
+            .padding(12)
         }
         .frame(minWidth: AppConstants.sidebarMinWidth, idealWidth: AppConstants.sidebarWidth, maxWidth: AppConstants.sidebarMaxWidth)
         .background(AppColors.sidebar)
@@ -92,14 +92,14 @@ struct SidebarViewNew: View {
 
 // MARK: - Password Row New
 
-/// Redesigned password row with selection state
+/// Redesigned password row with selection state - matches prototype
 struct PasswordRowNew: View {
     let item: DecryptedPasswordItem
     let isSelected: Bool
 
     var body: some View {
         HStack(spacing: 12) {
-            // Category icon with gradient background
+            // Category icon with gradient background - matches prototype
             ZStack {
                 RoundedRectangle(cornerRadius: AppConstants.radiusMd)
                     .fill(
@@ -122,7 +122,7 @@ struct PasswordRowNew: View {
                     )
             }
 
-            // Title and username
+            // Title and username - matches prototype
             VStack(alignment: .leading, spacing: 2) {
                 Text(item.title)
                     .font(.subheadline)
@@ -138,7 +138,7 @@ struct PasswordRowNew: View {
 
             Spacer()
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .background(isSelected ? AppColors.sidebarAccent : Color.clear)
         .contentShape(Rectangle())
@@ -147,7 +147,7 @@ struct PasswordRowNew: View {
 
 // MARK: - Category Row
 
-/// Category row with icon
+/// Category row with icon - matches prototype
 struct CategoryRow: View {
     let category: String
     let isSelected: Bool

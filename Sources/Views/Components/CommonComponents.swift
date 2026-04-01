@@ -28,11 +28,12 @@ struct GradientIcon: View {
 
 // MARK: - Styled Text Field
 
-/// Styled text field with rounded corners and border
+/// Styled text field with rounded corners and border - matches prototype
 struct StyledTextField: View {
     let placeholder: String
     @Binding var text: String
     var icon: String? = nil
+    var isFocused: Bool = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -53,18 +54,19 @@ struct StyledTextField: View {
         .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
         .overlay(
             RoundedRectangle(cornerRadius: AppConstants.radiusXl)
-                .stroke(AppColors.border, lineWidth: 1)
+                .stroke(isFocused ? AppColors.primary : AppColors.border, lineWidth: isFocused ? 2 : 1)
         )
     }
 }
 
 // MARK: - Styled Secure Field
 
-/// Styled secure field for password input
+/// Styled secure field for password input - matches prototype
 struct StyledSecureField: View {
     let placeholder: String
     @Binding var text: String
     @State private var isSecure: Bool = true
+    var isFocused: Bool = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -97,14 +99,14 @@ struct StyledSecureField: View {
         .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
         .overlay(
             RoundedRectangle(cornerRadius: AppConstants.radiusXl)
-                .stroke(AppColors.border, lineWidth: 1)
+                .stroke(isFocused ? AppColors.primary : AppColors.border, lineWidth: isFocused ? 2 : 1)
         )
     }
 }
 
 // MARK: - Form Field
 
-/// Form field with label and input
+/// Form field with label and input - matches prototype styling
 struct FormField: View {
     let label: String
     let placeholder: String
@@ -123,6 +125,67 @@ struct FormField: View {
                 StyledSecureField(placeholder: placeholder, text: $text)
             } else {
                 StyledTextField(placeholder: placeholder, text: $text, icon: icon)
+            }
+        }
+    }
+}
+
+// MARK: - Right-aligned Form Field
+
+/// Form field with right-aligned label (matches prototype)
+struct FormFieldRightLabel: View {
+    let label: String
+    let placeholder: String
+    @Binding var text: String
+    var icon: String? = nil
+    var isSecure: Bool = false
+    @State private var isFocused: Bool = false
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 16) {
+            Text(label)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(AppColors.foreground)
+                .frame(width: 100, alignment: .trailing)
+
+            if isSecure {
+                HStack(spacing: 12) {
+                    if isFocused {
+                        TextField(placeholder, text: $text)
+                            .textFieldStyle(.plain)
+                    } else {
+                        SecureField(placeholder, text: $text)
+                            .textFieldStyle(.plain)
+                    }
+
+                    TogglePasswordButton(isSecure: $isFocused)
+                }
+                .frame(height: AppConstants.inputHeight)
+                .background(AppColors.inputBackground)
+                .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppConstants.radiusXl)
+                        .stroke(AppColors.border, lineWidth: 1)
+                )
+            } else {
+                HStack(spacing: 12) {
+                    if let icon = icon {
+                        Image(systemName: icon)
+                            .foregroundColor(AppColors.mutedForeground)
+                            .frame(width: AppConstants.iconSizeMd)
+                    }
+
+                    TextField(placeholder, text: $text)
+                        .textFieldStyle(.plain)
+                }
+                .frame(height: AppConstants.inputHeight)
+                .background(AppColors.inputBackground)
+                .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppConstants.radiusXl)
+                        .stroke(AppColors.border, lineWidth: 1)
+                )
             }
         }
     }
