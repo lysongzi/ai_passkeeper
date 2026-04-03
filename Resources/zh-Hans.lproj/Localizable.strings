@@ -91,3 +91,6 @@
 
 /* Add/Edit */
 "addEdit.details" = "详情";
+"settings.back" = "返回";
+"settings.resetPasswordDesc" = "修改用于解锁密码库的主密码。";
+"settings.resetSuccess" = "密码已成功更新。";

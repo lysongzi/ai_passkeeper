@@ -429,13 +429,23 @@ struct ActionButtonRow: View {
             }
             .buttonStyle(SecondaryButtonStyle())
 
-            Button {
-                primaryAction()
-            } label: {
-                Text(primaryTitle)
+            if isPrimaryDestructive {
+                Button {
+                    primaryAction()
+                } label: {
+                    Text(primaryTitle)
+                }
+                .buttonStyle(DestructiveButtonStyle())
+                .disabled(!isPrimaryEnabled)
+            } else {
+                Button {
+                    primaryAction()
+                } label: {
+                    Text(primaryTitle)
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                .disabled(!isPrimaryEnabled)
             }
-            .buttonStyle(isPrimaryDestructive ? DestructiveButtonStyle() : PrimaryButtonStyle())
-            .disabled(!isPrimaryEnabled)
         }
     }
 }

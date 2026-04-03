@@ -91,3 +91,6 @@
 
 /* Add/Edit */
 "addEdit.details" = "Details";
+"settings.back" = "Back";
+"settings.resetPasswordDesc" = "Change your primary password used to unlock the vault.";
+"settings.resetSuccess" = "Password updated successfully.";

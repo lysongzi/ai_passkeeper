@@ -1,47 +1,24 @@
 import SwiftUI
 import AppKit
 
-// MARK: - Theme Appearance
-
-/// Theme appearance mode enum - independent from SettingsViewModel
-enum ThemeAppearance: Int, CaseIterable, Identifiable {
-    case system = 0
-    case light = 1
-    case dark = 2
-
-    var id: Int { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .system: return "settings.appearance.system".localized
-        case .light: return "settings.appearance.light".localized
-        case .dark: return "settings.appearance.dark".localized
-        }
-    }
-}
-
 // MARK: - Theme Manager
 
-/// Theme manager for handling theme persistence and switching
+/// Shared theme manager bridged to the app-wide AppearanceMode preference.
 final class ThemeManager: ObservableObject {
     static let shared = ThemeManager()
 
-    @Published var appearanceMode: ThemeAppearance {
+    @Published var appearanceMode: AppearanceMode {
         didSet {
             saveAppearance()
             applyAppearance()
         }
     }
 
-    private let appearanceKey = "theme_appearance_mode"
+    private let appearanceKey = "app_appearance_mode"
 
     private init() {
         let savedValue = UserDefaults.standard.integer(forKey: appearanceKey)
-        if let mode = ThemeAppearance(rawValue: savedValue) {
-            self.appearanceMode = mode
-        } else {
-            self.appearanceMode = .system
-        }
+        self.appearanceMode = AppearanceMode(rawValue: savedValue) ?? .system
         applyAppearance()
     }
 
@@ -49,16 +26,19 @@ final class ThemeManager: ObservableObject {
         UserDefaults.standard.set(appearanceMode.rawValue, forKey: appearanceKey)
     }
 
-    private func applyAppearance() {
-        guard let window = NSApplication.shared.windows.first else { return }
+    func setAppearance(_ mode: AppearanceMode) {
+        guard appearanceMode != mode else { return }
+        appearanceMode = mode
+    }
 
+    func applyAppearance() {
         switch appearanceMode {
         case .system:
-            window.appearance = nil
+            NSApp.appearance = nil
         case .light:
-            window.appearance = NSAppearance(named: .aqua)
+            NSApp.appearance = NSAppearance(named: .aqua)
         case .dark:
-            window.appearance = NSAppearance(named: .darkAqua)
+            NSApp.appearance = NSAppearance(named: .darkAqua)
         }
     }
 
@@ -76,7 +56,7 @@ final class ThemeManager: ObservableObject {
 
 // MARK: - Theme Toggle Button
 
-/// Button to toggle between light/dark modes - matches prototype styling
+/// Button to toggle between light/dark/system modes - matches prototype styling.
 struct ThemeToggleButton: View {
     @StateObject private var themeManager = ThemeManager.shared
 

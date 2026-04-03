@@ -3,14 +3,13 @@ import AppKit
 
 // MARK: - Password Detail View New
 
-/// Redesigned detail view for a password entry with shadcn/ui styling - matches prototype
+/// Rebuilt detail view aligned to the RedesignUI prototype.
 struct PasswordDetailViewNew: View {
     let item: DecryptedPasswordItem
     let onDelete: () -> Void
     let onSave: () -> Void
 
     @State private var showPassword = false
-    @State private var copyFeedback: String?
     @State private var showingDeleteConfirmation = false
     @State private var isEditing = false
 
@@ -33,29 +32,139 @@ struct PasswordDetailViewNew: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: AppSpacing.xl) {
                 headerSection
 
-                Divider()
-                    .padding(.horizontal, 16)
+                detailFieldSection(
+                    title: "detail.username".localized,
+                    content: {
+                        if isEditing {
+                            editableTextField(text: $editedUsername, placeholder: "addEdit.username".localized)
+                        } else {
+                            PKFieldContainer {
+                                HStack(spacing: AppSpacing.sm) {
+                                    Text(item.username)
+                                        .font(.body)
+                                        .textSelection(.enabled)
+                                        .foregroundColor(AppColors.foreground)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                usernameSection
+                                    CopyButton(text: item.username)
+                                }
+                            }
+                        }
+                    }
+                )
 
-                passwordSection
+                detailFieldSection(
+                    title: "detail.password".localized,
+                    content: {
+                        if isEditing {
+                            HStack(spacing: AppSpacing.sm) {
+                                PKFieldContainer {
+                                    Group {
+                                        if showEditedPassword {
+                                            TextField("detail.password".localized, text: $editedPassword)
+                                        } else {
+                                            SecureField("detail.password".localized, text: $editedPassword)
+                                        }
+                                    }
+                                    .textFieldStyle(.plain)
+                                }
 
-                categorySection
+                                TogglePasswordButton(isSecure: $showEditedPassword)
+                            }
+                        } else {
+                            HStack(spacing: AppSpacing.sm) {
+                                PKFieldContainer {
+                                    Text(showPassword ? item.password : String(repeating: "•", count: min(item.password.count, 20)))
+                                        .font(.system(.body, design: .monospaced))
+                                        .foregroundColor(AppColors.foreground)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
 
-                notesSection
+                                TogglePasswordButton(isSecure: $showPassword)
+                                CopyButton(text: item.password)
+                            }
+                        }
+                    }
+                )
 
-                metadataSection
+                detailFieldSection(
+                    title: "addEdit.category".localized,
+                    content: {
+                        if isEditing {
+                            Menu {
+                                ForEach(categories, id: \.self) { category in
+                                    Button(category) {
+                                        editedCategory = category
+                                    }
+                                }
+                            } label: {
+                                PKFieldContainer {
+                                    HStack {
+                                        Text(editedCategory)
+                                            .foregroundColor(AppColors.foreground)
+                                        Spacer()
+                                        Image(systemName: "chevron.up.chevron.down")
+                                            .font(.system(size: 12))
+                                            .foregroundColor(AppColors.mutedForeground)
+                                    }
+                                }
+                            }
+                            .menuStyle(.borderlessButton)
+                        } else {
+                            PKFieldContainer {
+                                HStack(spacing: AppSpacing.sm) {
+                                    Image(systemName: categoryIcon(for: item.category))
+                                        .foregroundColor(AppColors.sidebarPrimary)
+                                    Text(localizedCategory)
+                                        .foregroundColor(AppColors.foreground)
+                                    Spacer()
+                                }
+                            }
+                        }
+                    }
+                )
 
-                Spacer()
+                if isEditing || !item.notes.isEmpty {
+                    detailFieldSection(
+                        title: "detail.notes".localized,
+                        content: {
+                            if isEditing {
+                                TextEditor(text: $editedNotes)
+                                    .font(.body)
+                                    .frame(minHeight: 120)
+                                    .scrollContentBackground(.hidden)
+                                    .padding(AppSpacing.xs)
+                                    .background(AppColors.inputBackground)
+                                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: AppConstants.radiusMd)
+                                            .stroke(AppColors.border, lineWidth: 1)
+                                    )
+                            } else {
+                                PKFieldContainer(minHeight: 120) {
+                                    Text(item.notes)
+                                        .font(.body)
+                                        .foregroundColor(AppColors.foreground)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                            }
+                        }
+                    )
+                }
+
+                PKMetadataPanel(title: "detail.details".localized) {
+                    metadataRow(title: "detail.created".localized, value: item.createdAt.formatted(date: .abbreviated, time: .omitted))
+                    metadataRow(title: "detail.lastModified".localized, value: item.updatedAt.formatted(date: .abbreviated, time: .omitted))
+                }
 
                 if !isEditing {
                     deleteButton
                 }
             }
-            .padding(.vertical, 16)
+            .padding(AppSpacing.xl)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColors.background)
@@ -73,313 +182,112 @@ struct PasswordDetailViewNew: View {
 
     @ViewBuilder
     private var headerSection: some View {
-        HStack(alignment: .center, spacing: 16) {
-            // Gradient icon - matches prototype
+        HStack(alignment: .center, spacing: AppSpacing.lg) {
             ZStack {
                 RoundedRectangle(cornerRadius: AppConstants.radiusLg)
                     .fill(
                         LinearGradient(
-                            colors: [AppColors.gradientPrimary.opacity(0.15), AppColors.gradientOrange.opacity(0.15)],
+                            colors: [AppColors.gradientPrimary.opacity(0.16), AppColors.gradientOrange.opacity(0.16)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 64, height: 64)
+                    .frame(width: 68, height: 68)
 
-                GradientIcon(systemName: "key.fill", size: 28)
+                GradientIcon(systemName: "key.fill", size: 30)
             }
 
-            if isEditing {
-                VStack(alignment: .leading, spacing: 4) {
-                    TextField("addEdit.titleField".localized, text: $editedTitle)
-                        .textFieldStyle(.plain)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .padding(12)
-                        .frame(height: 48)
-                        .background(AppColors.inputBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppConstants.radiusMd)
-                                .stroke(AppColors.border, lineWidth: 1)
-                        )
-                }
-            } else {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(item.title)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(AppColors.foreground)
+            Group {
+                if isEditing {
+                    editableTitleField
+                } else {
+                    VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                        Text(item.title)
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundColor(AppColors.foreground)
 
-                    Text(localizedCategory)
-                        .font(.subheadline)
-                        .foregroundColor(AppColors.mutedForeground)
+                        Text(localizedCategory)
+                            .font(.subheadline)
+                            .foregroundColor(AppColors.mutedForeground)
+                    }
                 }
             }
-
-            Spacer()
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             headerButtons
         }
-        .padding(.horizontal, 16)
+    }
+
+    @ViewBuilder
+    private var editableTitleField: some View {
+        PKFieldContainer(minHeight: 48) {
+            TextField("addEdit.titleField".localized, text: $editedTitle)
+                .textFieldStyle(.plain)
+                .font(.system(size: 26, weight: .bold))
+        }
     }
 
     @ViewBuilder
     private var headerButtons: some View {
-        if isEditing {
-            Button("detail.cancel".localized) {
-                cancelEditing()
-            }
-            .buttonStyle(SecondaryButtonStyle())
-
-            Button("addEdit.save".localized) {
-                saveChanges()
-            }
-            .buttonStyle(PrimaryButtonStyle())
-            .disabled(isSaving || editedTitle.trimmingCharacters(in: .whitespaces).isEmpty)
-        } else {
-            Button {
-                startEditing()
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "pencil")
-                    Text("detail.edit".localized)
-                }
-            }
-            .buttonStyle(SecondaryButtonStyle())
-        }
-    }
-
-    // MARK: - Username Section
-
-    @ViewBuilder
-    private var usernameSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("detail.username".localized)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(AppColors.mutedForeground)
-
+        HStack(spacing: AppSpacing.sm) {
             if isEditing {
-                TextField("addEdit.username".localized, text: $editedUsername)
-                    .textFieldStyle(.plain)
-                    .padding(12)
-                    .frame(height: AppConstants.inputHeight)
-                    .background(AppColors.inputBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppConstants.radiusMd)
-                            .stroke(AppColors.border, lineWidth: 1)
-                    )
+                Button("detail.cancel".localized) {
+                    cancelEditing()
+                }
+                .buttonStyle(SecondaryButtonStyle())
+
+                Button("addEdit.save".localized) {
+                    saveChanges()
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                .disabled(isSaving || editedTitle.trimmingCharacters(in: .whitespaces).isEmpty)
             } else {
-                HStack {
-                    Text(item.username)
-                        .font(.body)
-                        .textSelection(.enabled)
-                        .foregroundColor(AppColors.foreground)
-                    Spacer()
-                    CopyButton(text: item.username)
-                }
-                .padding(12)
-                .background(AppColors.inputBackground)
-                .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
-            }
-        }
-        .padding(.horizontal, 16)
-    }
-
-    // MARK: - Password Section
-
-    @ViewBuilder
-    private var passwordSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("detail.password".localized)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(AppColors.mutedForeground)
-
-            HStack(spacing: 12) {
-                if isEditing {
-                    // Edit mode - matches prototype
-                    Group {
-                        if showEditedPassword {
-                            TextField("detail.password".localized, text: $editedPassword)
-                        } else {
-                            SecureField("detail.password".localized, text: $editedPassword)
-                        }
-                    }
-                    .textFieldStyle(.plain)
-                    .padding(12)
-                    .frame(height: AppConstants.inputHeight)
-                    .background(AppColors.inputBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppConstants.radiusMd)
-                            .stroke(AppColors.border, lineWidth: 1)
-                    )
-
-                    TogglePasswordButton(isSecure: $showEditedPassword)
-                } else {
-                    // Display mode - matches prototype
-                    Group {
-                        if showPassword {
-                            Text(item.password)
-                                .font(.system(.body, design: .monospaced))
-                        } else {
-                            Text(String(repeating: "•", count: min(item.password.count, 20)))
-                                .font(.system(.body, design: .monospaced))
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .foregroundColor(AppColors.foreground)
-                    .padding(12)
-                    .background(AppColors.inputBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
-
-                    TogglePasswordButton(isSecure: $showPassword)
-
-                    CopyButton(text: item.password)
-                }
-            }
-
-            if !isEditing {
-                Text("common.copied".localized)
-                    .font(.caption)
-                    .foregroundColor(.green)
-                    .opacity(copyFeedback != nil ? 1 : 0)
-            }
-        }
-        .padding(.horizontal, 16)
-    }
-
-    // MARK: - Category Section
-
-    @ViewBuilder
-    private var categorySection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("addEdit.category".localized)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(AppColors.mutedForeground)
-
-            if isEditing {
-                Menu {
-                    ForEach(categories, id: \.self) { category in
-                        Button {
-                            editedCategory = category
-                        } label: {
-                            Text(category)
-                        }
-                    }
+                Button {
+                    startEditing()
                 } label: {
-                    HStack {
-                        Text(editedCategory)
-                            .foregroundColor(AppColors.foreground)
-                        Spacer()
-                        Image(systemName: "chevron.up.chevron.down")
-                            .font(.system(size: 12))
-                            .foregroundColor(AppColors.mutedForeground)
-                    }
-                    .padding(.horizontal, 16)
-                    .frame(height: AppConstants.inputHeight)
-                    .background(AppColors.inputBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
-                }
-                .menuStyle(.borderlessButton)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.radiusMd)
-                        .stroke(AppColors.border, lineWidth: 1)
-                )
-            } else {
-                HStack {
-                    Image(systemName: categoryIcon(for: item.category))
-                        .foregroundColor(AppColors.sidebarPrimary)
-                    Text(localizedCategory)
-                        .foregroundColor(AppColors.foreground)
-                    Spacer()
-                }
-                .padding(12)
-                .background(AppColors.inputBackground)
-                .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
-            }
-        }
-        .padding(.horizontal, 16)
-    }
-
-    // MARK: - Notes Section
-
-    @ViewBuilder
-    private var notesSection: some View {
-        Group {
-            if isEditing || !item.notes.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("detail.notes".localized)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundColor(AppColors.mutedForeground)
-
-                    if isEditing {
-                        TextEditor(text: $editedNotes)
-                            .font(.body)
-                            .frame(height: 120)
-                            .scrollContentBackground(.hidden)
-                            .padding(8)
-                            .background(AppColors.inputBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: AppConstants.radiusMd)
-                                    .stroke(AppColors.border, lineWidth: 1)
-                            )
-                    } else {
-                        Text(item.notes)
-                            .font(.body)
-                            .foregroundColor(AppColors.foreground)
-                            .padding(12)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(AppColors.inputBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+                    HStack(spacing: AppSpacing.xs) {
+                        Image(systemName: "pencil")
+                        Text("detail.edit".localized)
                     }
                 }
-                .padding(.horizontal, 16)
+                .buttonStyle(SecondaryButtonStyle())
             }
         }
+        .frame(maxWidth: 220)
     }
 
-    // MARK: - Metadata Section
+    // MARK: - Shared Section Builders
 
     @ViewBuilder
-    private var metadataSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("detail.details".localized)
-                .font(.subheadline)
-                .fontWeight(.medium)
+    private func detailFieldSection<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            Text(title)
+                .font(.subheadline.weight(.medium))
                 .foregroundColor(AppColors.mutedForeground)
 
-            // Metadata display - inline implementation
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("detail.created".localized)
-                        .foregroundColor(AppColors.mutedForeground)
-                    Spacer()
-                    Text(item.createdAt.formatted(date: .abbreviated, time: .omitted))
-                        .foregroundColor(AppColors.foreground)
-                }
-                .font(.caption)
-
-                HStack {
-                    Text("detail.lastModified".localized)
-                        .foregroundColor(AppColors.mutedForeground)
-                    Spacer()
-                    Text(item.updatedAt.formatted(date: .abbreviated, time: .omitted))
-                        .foregroundColor(AppColors.foreground)
-                }
-                .font(.caption)
-            }
-            .padding(12)
-            .background(AppColors.inputBackground)
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+            content()
         }
-        .padding(.horizontal, 16)
+    }
+
+    @ViewBuilder
+    private func editableTextField(text: Binding<String>, placeholder: String) -> some View {
+        PKFieldContainer {
+            TextField(placeholder, text: text)
+                .textFieldStyle(.plain)
+                .foregroundColor(AppColors.foreground)
+        }
+    }
+
+    @ViewBuilder
+    private func metadataRow(title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .foregroundColor(AppColors.mutedForeground)
+            Spacer()
+            Text(value)
+                .foregroundColor(AppColors.foreground)
+        }
+        .font(.caption)
     }
 
     // MARK: - Delete Button
@@ -389,14 +297,13 @@ struct PasswordDetailViewNew: View {
         Button(role: .destructive) {
             showingDeleteConfirmation = true
         } label: {
-            HStack(spacing: 8) {
+            HStack(spacing: AppSpacing.xs) {
                 Image(systemName: "trash")
                 Text("detail.deletePassword".localized)
             }
         }
         .buttonStyle(DestructiveButtonStyle())
-        .padding(.horizontal, 16)
-        .padding(.top, 16)
+        .padding(.top, AppSpacing.sm)
     }
 
     // MARK: - Actions

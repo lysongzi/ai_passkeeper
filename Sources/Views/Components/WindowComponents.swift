@@ -97,24 +97,24 @@ struct ToolbarButtonsRow: View {
     var body: some View {
         HStack(spacing: 8) {
             // Add button
-            ToolbarButton(icon: "plus", label: nil) {
+            ToolbarButton("plus", label: nil) {
                 onAdd()
             }
 
             // Settings button
-            ToolbarButton(icon: "gearshape", label: nil) {
+            ToolbarButton("gearshape", label: nil) {
                 onSettings()
             }
 
             // Lock button
-            ToolbarButton(icon: "lock", label: nil) {
+            ToolbarButton("lock", label: nil) {
                 onLock()
             }
 
             Spacer()
 
             // Theme toggle
-            ToolbarButton(icon: "sun.max", label: nil) {
+            ToolbarButton("sun.max", label: nil) {
                 onThemeToggle()
             }
         }
@@ -139,13 +139,15 @@ struct ToolbarIconButton: View {
 
     var body: some View {
         Button(action: action) {
-            if let label = label {
-                HStack(spacing: 6) {
+            Group {
+                if let label = label {
+                    HStack(spacing: 6) {
+                        Image(systemName: icon)
+                        Text(label)
+                    }
+                } else {
                     Image(systemName: icon)
-                    Text(label)
                 }
-            } else {
-                Image(systemName: icon)
             }
             .font(.system(size: AppConstants.iconSizeMd))
         }
@@ -231,12 +233,14 @@ struct FieldRow: View {
                 .foregroundColor(AppColors.mutedForeground)
 
             HStack(spacing: 12) {
-                if isSecure && !isRevealed {
-                    Text(String(repeating: "•", count: min(value.count, 20)))
-                        .font(.system(.body, design: .monospaced))
-                } else {
-                    Text(value)
-                        .font(.body)
+                Group {
+                    if isSecure && !isRevealed {
+                        Text(String(repeating: "•", count: min(value.count, 20)))
+                            .font(.system(.body, design: .monospaced))
+                    } else {
+                        Text(value)
+                            .font(.body)
+                    }
                 }
                 .foregroundColor(AppColors.foreground)
                 .frame(maxWidth: .infinity, alignment: .leading)

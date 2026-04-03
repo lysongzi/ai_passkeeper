@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Redesigned Sidebar View
 
-/// Redesigned sidebar with shadcn/ui styling - matches prototype
+/// Rebuilt sidebar aligned to the RedesignUI prototype.
 struct SidebarViewNew: View {
     @ObservedObject var viewModel: PasswordListViewModel
     @Binding var selectedPasswordId: UUID?
@@ -10,18 +10,17 @@ struct SidebarViewNew: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Search - matches prototype
             StyledTextField(
                 placeholder: "main.search".localized,
                 text: $viewModel.searchText,
                 icon: "magnifyingglass"
             )
-            .padding(.horizontal, 12)
-            .padding(.vertical, 12)
+            .padding(.horizontal, AppSpacing.sm)
+            .padding(.top, AppSpacing.sm)
+            .padding(.bottom, AppSpacing.md)
 
-            // Password list - matches prototype
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 0) {
+                LazyVStack(alignment: .leading, spacing: AppSpacing.xs) {
                     ForEach(viewModel.passwords, id: \.id) { item in
                         PasswordRowNew(
                             item: item,
@@ -32,79 +31,85 @@ struct SidebarViewNew: View {
                         }
                     }
                 }
+                .padding(.horizontal, AppSpacing.sm)
+                .padding(.bottom, AppSpacing.lg)
             }
             .frame(maxHeight: .infinity)
 
-            Divider()
-                .padding(.horizontal, 12)
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                Divider()
+                    .overlay(AppColors.sidebarBorder)
+                    .padding(.horizontal, AppSpacing.sm)
 
-            // Category filter - matches prototype
-            VStack(alignment: .leading, spacing: 4) {
                 Text("main.categories".localized)
-                    .font(.caption)
-                    .fontWeight(.medium)
+                    .font(.caption.weight(.medium))
                     .foregroundColor(AppColors.mutedForeground)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 12)
-                    .padding(.bottom, 8)
+                    .padding(.horizontal, AppSpacing.md)
 
-                ForEach(viewModel.categories, id: \.self) { category in
-                    CategoryRow(
-                        category: category,
-                        isSelected: viewModel.selectedCategory == category
-                    )
-                    .onTapGesture {
-                        Task {
-                            await viewModel.filterByCategory(category)
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    ForEach(viewModel.categories, id: \.self) { category in
+                        CategoryRow(
+                            category: category,
+                            isSelected: viewModel.selectedCategory == category
+                        )
+                        .onTapGesture {
+                            Task {
+                                await viewModel.filterByCategory(category)
+                            }
                         }
                     }
                 }
+                .padding(.horizontal, AppSpacing.sm)
             }
+            .padding(.bottom, AppSpacing.sm)
 
             Divider()
-                .padding(.horizontal, 12)
-                .padding(.top, 8)
+                .overlay(AppColors.sidebarBorder)
+                .padding(.horizontal, AppSpacing.sm)
 
-            // Settings button - matches prototype
             Button {
                 showingSettings = true
             } label: {
-                HStack(spacing: 10) {
+                HStack(spacing: AppSpacing.sm) {
                     Image(systemName: "gearshape")
-                        .font(.system(size: AppConstants.iconSizeMd))
+                        .font(.system(size: AppConstants.iconSizeMd, weight: .medium))
                     Text("settings.title".localized)
-                        .font(.subheadline)
+                        .font(.subheadline.weight(.medium))
                 }
                 .foregroundColor(AppColors.sidebarForeground)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                .padding(.horizontal, AppSpacing.md)
+                .frame(height: 44)
                 .background(AppColors.sidebarAccent)
                 .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
             }
             .buttonStyle(.plain)
-            .padding(12)
+            .padding(AppSpacing.sm)
         }
         .frame(minWidth: AppConstants.sidebarMinWidth, idealWidth: AppConstants.sidebarWidth, maxWidth: AppConstants.sidebarMaxWidth)
         .background(AppColors.sidebar)
+        .overlay(alignment: .trailing) {
+            Rectangle()
+                .fill(AppColors.sidebarBorder)
+                .frame(width: 1)
+        }
     }
 }
 
 // MARK: - Password Row New
 
-/// Redesigned password row with selection state - matches prototype
+/// Redesigned password row with prototype-like selected state.
 struct PasswordRowNew: View {
     let item: DecryptedPasswordItem
     let isSelected: Bool
 
     var body: some View {
-        HStack(spacing: 12) {
-            // Category icon with gradient background - matches prototype
+        HStack(spacing: AppSpacing.sm) {
             ZStack {
                 RoundedRectangle(cornerRadius: AppConstants.radiusMd)
                     .fill(
                         LinearGradient(
-                            colors: [AppColors.gradientPrimary.opacity(0.15), AppColors.gradientOrange.opacity(0.15)],
+                            colors: [AppColors.gradientPrimary.opacity(0.16), AppColors.gradientOrange.opacity(0.16)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -112,7 +117,7 @@ struct PasswordRowNew: View {
                     .frame(width: 40, height: 40)
 
                 Image(systemName: categoryIcon(for: item.category))
-                    .font(.system(size: AppConstants.iconSizeSm))
+                    .font(.system(size: AppConstants.iconSizeSm, weight: .semibold))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [AppColors.gradientPrimary, AppColors.gradientOrange],
@@ -122,12 +127,10 @@ struct PasswordRowNew: View {
                     )
             }
 
-            // Title and username - matches prototype
             VStack(alignment: .leading, spacing: 2) {
                 Text(item.title)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(AppColors.foreground)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundColor(AppColors.sidebarForeground)
                     .lineLimit(1)
 
                 Text(item.username)
@@ -136,26 +139,38 @@ struct PasswordRowNew: View {
                     .lineLimit(1)
             }
 
-            Spacer()
+            Spacer(minLength: 0)
         }
-        .padding(.horizontal, 12)
+        .padding(.horizontal, AppSpacing.sm)
         .padding(.vertical, 10)
-        .background(isSelected ? AppColors.sidebarAccent : Color.clear)
-        .contentShape(Rectangle())
+        .background(selectionBackground)
+        .overlay(selectionBorder)
+        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusLg))
+        .contentShape(RoundedRectangle(cornerRadius: AppConstants.radiusLg))
+    }
+
+    private var selectionBackground: some View {
+        RoundedRectangle(cornerRadius: AppConstants.radiusLg)
+            .fill(isSelected ? AppColors.sidebarAccent : Color.clear)
+    }
+
+    private var selectionBorder: some View {
+        RoundedRectangle(cornerRadius: AppConstants.radiusLg)
+            .stroke(isSelected ? AppColors.primary.opacity(0.55) : Color.clear, lineWidth: 1.5)
     }
 }
 
 // MARK: - Category Row
 
-/// Category row with icon - matches prototype
+/// Category row with icon.
 struct CategoryRow: View {
     let category: String
     let isSelected: Bool
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: AppSpacing.sm) {
             Image(systemName: categoryIcon(for: category))
-                .font(.system(size: AppConstants.iconSizeSm))
+                .font(.system(size: AppConstants.iconSizeSm, weight: .medium))
                 .foregroundColor(isSelected ? AppColors.sidebarPrimary : AppColors.mutedForeground)
                 .frame(width: 20)
 
@@ -163,11 +178,14 @@ struct CategoryRow: View {
                 .font(.subheadline)
                 .foregroundColor(isSelected ? AppColors.sidebarPrimary : AppColors.sidebarForeground)
 
-            Spacer()
+            Spacer(minLength: 0)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(isSelected ? AppColors.sidebarAccent : Color.clear)
-        .contentShape(Rectangle())
+        .padding(.horizontal, AppSpacing.md)
+        .frame(height: 36)
+        .background(
+            RoundedRectangle(cornerRadius: AppConstants.radiusMd)
+                .fill(isSelected ? AppColors.sidebarAccent : Color.clear)
+        )
+        .contentShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
     }
 }

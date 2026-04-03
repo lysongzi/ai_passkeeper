@@ -12,7 +12,6 @@ final class PasswordItemTests: XCTestCase {
             encryptedPassword: Data("encrypted".utf8)
         )
 
-        assert(item.id != nil, "ID should not be nil")
         assert(item.title == "Test Site", "Title should match")
         assert(item.username == "user@test.com", "Username should match")
         assert(item.category == "General", "Category should match")

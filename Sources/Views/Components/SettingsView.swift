@@ -2,353 +2,308 @@ import SwiftUI
 
 // MARK: - Settings View New
 
-/// Redesigned settings view with shadcn/ui styling - matches prototype
+/// Redesigned settings modal aligned to the RedesignUI prototype.
 struct SettingsViewNew: View {
     @StateObject private var viewModel = SettingsViewModel()
     @EnvironmentObject var i18nService: I18nService
-    @State private var showingResetSheet = false
     @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        ZStack {
-            // Semi-transparent background
-            Color.black.opacity(0.5)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    dismiss()
-                }
-
-            // Settings modal
-            VStack(spacing: 0) {
-                // Header
-                headerView
-                Divider()
-
-                // Content
-                ScrollView {
-                    VStack(spacing: 24) {
-                        generalSection
-                        Divider().padding(.horizontal, 16)
-                        securitySection
-                    }
-                    .padding(.vertical, 16)
-                }
-            }
-            .frame(width: 520, height: 540)
-            .background(AppColors.popover)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: Color.black.opacity(0.2), radius: 20)
-        }
-        .sheet(isPresented: $showingResetSheet) {
-            PasswordResetViewNew(viewModel: viewModel)
-        }
-    }
-
-    // MARK: - Header
-
-    @ViewBuilder
-    private var headerView: some View {
-        HStack {
-            Spacer()
-            Text("settings.title".localized)
-                .font(.title2)
-                .fontWeight(.semibold)
-                .foregroundColor(AppColors.foreground)
-            Spacer()
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 22))
-                    .foregroundColor(AppColors.mutedForeground)
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(16)
-    }
-
-    // MARK: - General Section
-
-    @ViewBuilder
-    private var generalSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("settings.general".localized)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(AppColors.mutedForeground)
-                .padding(.horizontal, 16)
-
-            // Card container
-            VStack(spacing: 0) {
-                languageRow
-                Divider().padding(.leading, 16)
-                appearanceRow
-            }
-            .background(AppColors.card)
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusLg))
-            .overlay(
-                RoundedRectangle(cornerRadius: AppConstants.radiusLg)
-                    .stroke(AppColors.border, lineWidth: 1)
-            )
-            .padding(.horizontal, 16)
-        }
-    }
-
-    @ViewBuilder
-    private var languageRow: some View {
-        HStack {
-            Text("settings.language".localized)
-                .font(.subheadline)
-                .foregroundColor(AppColors.foreground)
-            Spacer()
-            languagePicker
-        }
-        .padding(16)
-    }
-
-    @ViewBuilder
-    private var languagePicker: some View {
-        Picker("", selection: $viewModel.selectedLanguage) {
-            ForEach(I18nService.Language.allCases) { language in
-                Text(language.displayName).tag(language)
-            }
-        }
-        .pickerStyle(.menu)
-        .onChange(of: viewModel.selectedLanguage) { newValue in
-            viewModel.updateLanguage(newValue)
-        }
-    }
-
-    @ViewBuilder
-    private var appearanceRow: some View {
-        HStack {
-            Text("settings.appearance".localized)
-                .font(.subheadline)
-                .foregroundColor(AppColors.foreground)
-            Spacer()
-            appearancePicker
-        }
-        .padding(16)
-    }
-
-    @ViewBuilder
-    private var appearancePicker: some View {
-        Picker("", selection: $viewModel.selectedAppearance) {
-            ForEach(AppearanceMode.allCases) { mode in
-                Text(mode.displayName).tag(mode)
-            }
-        }
-        .pickerStyle(.menu)
-        .onChange(of: viewModel.selectedAppearance) { newValue in
-            viewModel.updateAppearance(newValue)
-        }
-    }
-
-    // MARK: - Security Section
-
-    @ViewBuilder
-    private var securitySection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("settings.security".localized)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(AppColors.mutedForeground)
-                .padding(.horizontal, 16)
-
-            VStack(spacing: 0) {
-                Button {
-                    showingResetSheet = true
-                } label: {
-                    HStack {
-                        Text("settings.resetPassword".localized)
-                            .font(.subheadline)
-                            .foregroundColor(AppColors.foreground)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 14))
-                            .foregroundColor(AppColors.mutedForeground)
-                    }
-                    .padding(16)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-            }
-            .background(AppColors.card)
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusLg))
-            .overlay(
-                RoundedRectangle(cornerRadius: AppConstants.radiusLg)
-                    .stroke(AppColors.border, lineWidth: 1)
-            )
-            .padding(.horizontal, 16)
-        }
-    }
-}
-
-// MARK: - Password Reset View New
-
-/// Redesigned password reset view
-struct PasswordResetViewNew: View {
-    @ObservedObject var viewModel: SettingsViewModel
+    @State private var route: SettingsModalRoute = .general
     @State private var currentPassword = ""
     @State private var newPassword = ""
     @State private var confirmPassword = ""
-    @State private var showError = false
-    @State private var errorMessage = ""
     @State private var isResetting = false
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            resetHeader
-            Divider()
+        PKModalContainer(onDismiss: { dismiss() }) {
+            VStack(spacing: 0) {
+                PKModalHeader(
+                    title: route.title,
+                    left: {
+                        if route == .general {
+                            Button("settings.cancel".localized) {
+                                dismiss()
+                            }
+                            .buttonStyle(.plain)
+                            .foregroundColor(AppColors.mutedForeground)
+                        } else {
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.18)) {
+                                    clearResetFeedback()
+                                    route = .general
+                                }
+                            } label: {
+                                HStack(spacing: AppSpacing.xs) {
+                                    Image(systemName: "chevron.left")
+                                    Text("settings.back".localized)
+                                }
+                                .font(.subheadline.weight(.medium))
+                                .foregroundColor(AppColors.mutedForeground)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    },
+                    right: {
+                        if route == .general {
+                            PKIconButton(systemName: "xmark") {
+                                dismiss()
+                            }
+                        } else {
+                            Button("settings.reset".localized) {
+                                Task {
+                                    await resetPassword()
+                                }
+                            }
+                            .font(.headline)
+                            .foregroundColor(AppColors.primaryForeground)
+                            .padding(.horizontal, AppSpacing.lg)
+                            .frame(height: 36)
+                            .background(isResetValid ? AppColors.primary : AppColors.muted)
+                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+                            .disabled(!isResetValid || isResetting)
+                        }
+                    }
+                )
 
-            // Form
-            resetForm
-            Spacer()
+                Divider()
+                    .overlay(AppColors.border)
+
+                Group {
+                    switch route {
+                    case .general:
+                        settingsContent
+                    case .resetPassword:
+                        resetPasswordContent
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .frame(width: 560, height: 560)
+            .background(AppColors.popover)
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
+            .shadow(color: AppElevation.modalShadow, radius: 20, x: 0, y: 8)
         }
-        .frame(width: 440, height: 480)
-        .background(AppColors.popover)
     }
 
-    @ViewBuilder
-    private var resetHeader: some View {
-        HStack {
-            Button("settings.cancel".localized) {
-                dismiss()
+    private var settingsContent: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                settingsSection(
+                    title: "settings.general".localized,
+                    rows: {
+                        PKFormRowRightLabel("settings.language".localized, labelWidth: 120) {
+                            settingsPicker(selection: $viewModel.selectedLanguage) {
+                                ForEach(I18nService.Language.allCases) { language in
+                                    Text(language.displayName).tag(language)
+                                }
+                            }
+                            .onChange(of: viewModel.selectedLanguage) { newValue in
+                                viewModel.updateLanguage(newValue)
+                            }
+                        }
+
+                        PKFormRowRightLabel("settings.appearance".localized, labelWidth: 120) {
+                            settingsPicker(selection: $viewModel.selectedAppearance) {
+                                ForEach(AppearanceMode.allCases) { mode in
+                                    Text(mode.displayName).tag(mode)
+                                }
+                            }
+                            .onChange(of: viewModel.selectedAppearance) { newValue in
+                                viewModel.updateAppearance(newValue)
+                            }
+                        }
+                    }
+                )
+
+                settingsSection(
+                    title: "settings.security".localized,
+                    rows: {
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.18)) {
+                                clearResetFeedback()
+                                route = .resetPassword
+                            }
+                        } label: {
+                            HStack(spacing: AppSpacing.md) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("settings.resetPassword".localized)
+                                        .font(.subheadline)
+                                        .foregroundColor(AppColors.foreground)
+                                    Text("settings.resetPasswordDesc".localized)
+                                        .font(.caption)
+                                        .foregroundColor(AppColors.mutedForeground)
+                                }
+
+                                Spacer(minLength: 0)
+
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundColor(AppColors.mutedForeground)
+                            }
+                            .padding(.horizontal, AppSpacing.md)
+                            .frame(minHeight: AppConstants.inputHeight)
+                            .background(AppColors.inputBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: AppConstants.radiusMd)
+                                    .stroke(AppColors.border, lineWidth: 1)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                )
             }
-            .buttonStyle(.plain)
-            .foregroundColor(AppColors.mutedForeground)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(AppColors.accent)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-
-            Spacer()
-
-            Text("settings.resetPassword".localized)
-                .font(.headline)
-                .foregroundColor(AppColors.foreground)
-
-            Spacer()
-
-            Button("settings.reset".localized) {
-                resetPassword()
-            }
-            .font(.headline)
-            .foregroundColor(AppColors.primaryForeground)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 10)
-            .background(isValid ? AppColors.primary : AppColors.muted)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .disabled(!isValid || isResetting)
+            .padding(.horizontal, AppSpacing.xl)
+            .padding(.vertical, AppSpacing.lg)
         }
-        .padding(16)
     }
 
-    @ViewBuilder
-    private var resetForm: some View {
-        VStack(spacing: 16) {
-            // Current password
-            passwordField(
-                label: "settings.currentPassword".localized,
-                text: $currentPassword
-            )
+    private var resetPasswordContent: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                if let feedback = feedbackMessage {
+                    feedbackBanner(message: feedback.message, color: feedback.color)
+                }
 
-            // New password
-            passwordField(
-                label: "settings.newPassword".localized,
-                text: $newPassword
-            )
+                settingsSection(
+                    title: "settings.resetPassword".localized,
+                    rows: {
+                        resetPasswordField(
+                            label: "settings.currentPassword".localized,
+                            text: $currentPassword,
+                            icon: "lock"
+                        )
 
-            // Confirm password
-            passwordField(
-                label: "settings.confirmPassword".localized,
-                text: $confirmPassword
-            )
+                        resetPasswordField(
+                            label: "settings.newPassword".localized,
+                            text: $newPassword,
+                            icon: "key"
+                        )
 
-            if showError {
-                Text(errorMessage)
-                    .font(.caption)
-                    .foregroundColor(AppColors.destructive)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                        resetPasswordField(
+                            label: "settings.confirmPassword".localized,
+                            text: $confirmPassword,
+                            icon: "checkmark.shield"
+                        )
+                    }
+                )
             }
+            .padding(.horizontal, AppSpacing.xl)
+            .padding(.vertical, AppSpacing.lg)
+        }
+    }
 
-            Text("settings.passwordMinLength".localized)
-                .font(.caption)
+    private func settingsSection<Rows: View>(title: String, @ViewBuilder rows: () -> Rows) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            Text(title)
+                .font(.subheadline.weight(.medium))
                 .foregroundColor(AppColors.mutedForeground)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .padding(16)
-    }
 
-    @ViewBuilder
-    private func passwordField(label: String, text: Binding<String>) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(label)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(AppColors.foreground)
-
-            HStack(spacing: 12) {
-                Image(systemName: "lock")
-                    .foregroundColor(AppColors.mutedForeground)
-                    .frame(width: AppConstants.iconSizeMd)
-
-                SecureField(label, text: text)
-                    .textFieldStyle(.plain)
+            PKMetadataPanel {
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    rows()
+                }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
-            .frame(height: AppConstants.inputHeight)
-            .background(AppColors.inputBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(label == "settings.currentPassword".localized ? AppColors.primary.opacity(0.3) : AppColors.border, lineWidth: label == "settings.currentPassword".localized ? 2 : 1)
-            )
         }
     }
 
-    private var isValid: Bool {
+    private func settingsPicker<SelectionValue: Hashable, Content: View>(
+        selection: Binding<SelectionValue>,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        Picker("", selection: selection) {
+            content()
+        }
+        .labelsHidden()
+        .pickerStyle(.menu)
+        .frame(width: 180, alignment: .trailing)
+    }
+
+    private func resetPasswordField(label: String, text: Binding<String>, icon: String) -> some View {
+        PKFormRowRightLabel(label, labelWidth: 140) {
+            PKFieldContainer {
+                HStack(spacing: AppSpacing.sm) {
+                    Image(systemName: icon)
+                        .foregroundColor(AppColors.mutedForeground)
+                        .frame(width: AppConstants.iconSizeMd)
+
+                    SecureField(label, text: text)
+                        .textFieldStyle(.plain)
+                }
+            }
+        }
+    }
+
+    private func feedbackBanner(message: String, color: Color) -> some View {
+        Text(message)
+            .font(.subheadline)
+            .foregroundColor(color)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, AppSpacing.md)
+            .padding(.vertical, AppSpacing.sm)
+            .background(color.opacity(0.12))
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+            .overlay(
+                RoundedRectangle(cornerRadius: AppConstants.radiusMd)
+                    .stroke(color.opacity(0.22), lineWidth: 1)
+            )
+    }
+
+    private func clearResetFeedback() {
+        viewModel.passwordResetError = nil
+        viewModel.passwordResetSuccess = false
+    }
+
+    private func resetPassword() async {
+        clearResetFeedback()
+        isResetting = true
+        defer { isResetting = false }
+
+        let success = await viewModel.resetPassword(
+            currentPassword: currentPassword,
+            newPassword: newPassword
+        )
+
+        if success {
+            currentPassword = ""
+            newPassword = ""
+            confirmPassword = ""
+        }
+    }
+
+    private var isResetValid: Bool {
         !currentPassword.isEmpty &&
         !newPassword.isEmpty &&
-        newPassword.count >= 8 &&
-        newPassword == confirmPassword
+        newPassword == confirmPassword &&
+        newPassword.count >= 6
     }
 
-    private func resetPassword() {
-        guard newPassword == confirmPassword else {
-            errorMessage = "settings.passwordMismatch".localized
-            showError = true
-            return
+    private var feedbackMessage: (message: String, color: Color)? {
+        if let error = viewModel.passwordResetError, !error.isEmpty {
+            return (error, AppColors.destructive)
         }
 
-        guard newPassword.count >= 8 else {
-            errorMessage = "settings.passwordTooShort".localized
-            showError = true
-            return
+        if viewModel.passwordResetSuccess {
+            return ("settings.resetSuccess".localized, AppColors.primary)
         }
 
-        isResetting = true
-        showError = false
+        if !confirmPassword.isEmpty && confirmPassword != newPassword {
+            return ("settings.passwordMismatch".localized, AppColors.destructive)
+        }
 
-        Task {
-            do {
-                try await AppState.shared.changePrimaryPassword(
-                    currentPassword: currentPassword,
-                    newPassword: newPassword
-                )
-                await MainActor.run {
-                    dismiss()
-                }
-            } catch {
-                await MainActor.run {
-                    errorMessage = error.localizedDescription
-                    showError = true
-                    isResetting = false
-                }
-            }
+        return nil
+    }
+}
+
+private enum SettingsModalRoute {
+    case general
+    case resetPassword
+
+    var title: String {
+        switch self {
+        case .general:
+            return "settings.title".localized
+        case .resetPassword:
+            return "settings.resetPassword".localized
         }
     }
 }

@@ -9,12 +9,15 @@
 /* Begin PBXBuildFile section */
 		007BB375781AC5352E535D93 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3BAB29A7E749DBD6FE2C2D15 /* Localizable.strings */; };
 		0093B9DA7B08007D110FC904 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338D2B260D6338848C8EA719 /* MainContentView.swift */; };
+		03455B65AAACB747D2BC311B /* UIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5432459D8E6A614F363A0B22 /* UIComponents.swift */; };
 		0A2F0CD4CF4AEF384F7E412B /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DE621269BBF2F80B3FBCF18 /* Theme.swift */; };
 		114CAA1F5FFD733DE121BF7B /* AuthenticationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F02FDD4E5CCC7282A481DFF /* AuthenticationViewModel.swift */; };
 		21F13D8D8166AAB8B2942C6B /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD9298A76677B332B176B6FC /* MainView.swift */; };
 		22196189FC1EFBA785DC9763 /* SecurityServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00C24B311AE61EB030230D5 /* SecurityServiceTests.swift */; };
 		298EED68E1047ED1AE7F20CE /* I18nService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845A20E7062F7107EFFC8C1B /* I18nService.swift */; };
+		2990C86FEC09468720D73EC6 /* WindowComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9675E127A57BABC74828B24A /* WindowComponents.swift */; };
 		3721CF88B22855AEEC48DD05 /* PasswordListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAA16DC7EAB221E4B14F43B /* PasswordListViewModel.swift */; };
+		572E114879102D082DFA0D4A /* ModalComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC2E92FCE0155F6B9C8DDE0 /* ModalComponents.swift */; };
 		6591F2E46E491422362197C4 /* AddEditPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B76E4C04EFDDC65BD7B8D6 /* AddEditPasswordView.swift */; };
 		65BE05EC905C50C77DED4DDF /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0068C58E64A7FBE839391D /* DatabaseManager.swift */; };
 		65C4A4F720AFA387CDC8F7F1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8E8660C02666C3D4886103 /* SettingsView.swift */; };
@@ -22,6 +25,7 @@
 		733D1AF8458D73291304E109 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360B1F38CC4C92FBF7C25D03 /* ThemeManager.swift */; };
 		7405E2581A219A9B5F01E40D /* PassKeeperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596BD74A642A0347009E81D4 /* PassKeeperTests.swift */; };
 		8044751185D4A49AF3DE835F /* PassKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B06D0355EFC99E0FB83DB6 /* PassKeeperApp.swift */; };
+		81D6EBC3FAB677FC61B6793F /* FormComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413533513680C6C18D9DDA80 /* FormComponents.swift */; };
 		837A0D40A43FE53640D99C60 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E9231745378FB6CE7028F6 /* KeychainService.swift */; };
 		848AEEE90EDB8E2A9607C0BA /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38900A0D19C38AEAD3280B6 /* AppState.swift */; };
 		8E0E738029925A2A0507E141 /* LocalAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4F53E87958EF680F39E341 /* LocalAuthService.swift */; };
@@ -58,17 +62,21 @@
 		2F02FDD4E5CCC7282A481DFF /* AuthenticationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationViewModel.swift; sourceTree = "<group>"; };
 		338D2B260D6338848C8EA719 /* MainContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
 		360B1F38CC4C92FBF7C25D03 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
+		413533513680C6C18D9DDA80 /* FormComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormComponents.swift; sourceTree = "<group>"; };
 		42A49BC759AFA3D2B485FDC6 /* PassKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PassKeeper.entitlements; sourceTree = "<group>"; };
 		48C1987E05A1B4AEA9B41708 /* AddEditPasswordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditPasswordViewModel.swift; sourceTree = "<group>"; };
 		48E9231745378FB6CE7028F6 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		4DE621269BBF2F80B3FBCF18 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		4EAA16DC7EAB221E4B14F43B /* PasswordListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordListViewModel.swift; sourceTree = "<group>"; };
+		5432459D8E6A614F363A0B22 /* UIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIComponents.swift; sourceTree = "<group>"; };
 		596BD74A642A0347009E81D4 /* PassKeeperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassKeeperTests.swift; sourceTree = "<group>"; };
 		5A87C4CD8E25AEC6CFA87C0A /* PasswordManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PasswordManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		67F022A33075986590301572 /* SecurityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityService.swift; sourceTree = "<group>"; };
 		845A20E7062F7107EFFC8C1B /* I18nService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = I18nService.swift; sourceTree = "<group>"; };
+		8CC2E92FCE0155F6B9C8DDE0 /* ModalComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalComponents.swift; sourceTree = "<group>"; };
 		8CDF225D7492BE361B6AB04A /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		8D7EABC98CB02307F8329864 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9675E127A57BABC74828B24A /* WindowComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowComponents.swift; sourceTree = "<group>"; };
 		96BC182A71C5728862231D49 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		9C0068C58E64A7FBE839391D /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		AA4F53E87958EF680F39E341 /* LocalAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAuthService.swift; sourceTree = "<group>"; };
@@ -195,13 +203,17 @@
 			children = (
 				B2B76E4C04EFDDC65BD7B8D6 /* AddEditPasswordView.swift */,
 				09242D7336DA0D07E26215C9 /* CommonComponents.swift */,
+				413533513680C6C18D9DDA80 /* FormComponents.swift */,
 				338D2B260D6338848C8EA719 /* MainContentView.swift */,
+				8CC2E92FCE0155F6B9C8DDE0 /* ModalComponents.swift */,
 				260511A9E3D9C35512E139C9 /* PasswordDetailView.swift */,
 				0D8E8660C02666C3D4886103 /* SettingsView.swift */,
 				C8972EECB55F714EDF258A34 /* SidebarView.swift */,
 				4DE621269BBF2F80B3FBCF18 /* Theme.swift */,
 				360B1F38CC4C92FBF7C25D03 /* ThemeManager.swift */,
+				5432459D8E6A614F363A0B22 /* UIComponents.swift */,
 				FB62C16782E5F16E2CE87208 /* UnlockView.swift */,
+				9675E127A57BABC74828B24A /* WindowComponents.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -349,11 +361,13 @@
 				DF1D59BB3D72033C312C6D4E /* CommonComponents.swift in Sources */,
 				C5D9F1B460847243AE3F2005 /* ContentView.swift in Sources */,
 				65BE05EC905C50C77DED4DDF /* DatabaseManager.swift in Sources */,
+				81D6EBC3FAB677FC61B6793F /* FormComponents.swift in Sources */,
 				298EED68E1047ED1AE7F20CE /* I18nService.swift in Sources */,
 				837A0D40A43FE53640D99C60 /* KeychainService.swift in Sources */,
 				8E0E738029925A2A0507E141 /* LocalAuthService.swift in Sources */,
 				0093B9DA7B08007D110FC904 /* MainContentView.swift in Sources */,
 				21F13D8D8166AAB8B2942C6B /* MainView.swift in Sources */,
+				572E114879102D082DFA0D4A /* ModalComponents.swift in Sources */,
 				8044751185D4A49AF3DE835F /* PassKeeperApp.swift in Sources */,
 				CC9768E020044361BABC0733 /* PasswordDetailView.swift in Sources */,
 				B98ED59027F45B46B1FF96C9 /* PasswordItem.swift in Sources */,
@@ -366,7 +380,9 @@
 				BA71EDF99C674BB5B6814CA8 /* SidebarView.swift in Sources */,
 				0A2F0CD4CF4AEF384F7E412B /* Theme.swift in Sources */,
 				733D1AF8458D73291304E109 /* ThemeManager.swift in Sources */,
+				03455B65AAACB747D2BC311B /* UIComponents.swift in Sources */,
 				D314EADE0DE290754871EEAD /* UnlockView.swift in Sources */,
+				2990C86FEC09468720D73EC6 /* WindowComponents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

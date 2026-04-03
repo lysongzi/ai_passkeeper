@@ -12,12 +12,11 @@ final class SettingsViewModel: ObservableObject {
     @Published var passwordResetSuccess = false
 
     private let i18nService = I18nService.shared
-    private let appearanceKey = "app_appearance_mode"
+    private let themeManager = ThemeManager.shared
 
     init() {
         self.selectedLanguage = i18nService.currentLanguage
-        let storedValue = UserDefaults.standard.integer(forKey: appearanceKey)
-        self.selectedAppearance = AppearanceMode(rawValue: storedValue) ?? .system
+        self.selectedAppearance = themeManager.appearanceMode
     }
 
     func updateLanguage(_ language: I18nService.Language) {
@@ -27,19 +26,7 @@ final class SettingsViewModel: ObservableObject {
 
     func updateAppearance(_ mode: AppearanceMode) {
         selectedAppearance = mode
-        UserDefaults.standard.set(mode.rawValue, forKey: appearanceKey)
-        applyAppearance(mode)
-    }
-
-    private func applyAppearance(_ mode: AppearanceMode) {
-        switch mode {
-        case .light:
-            NSApp.appearance = NSAppearance(named: .aqua)
-        case .dark:
-            NSApp.appearance = NSAppearance(named: .darkAqua)
-        case .system:
-            NSApp.appearance = nil
-        }
+        themeManager.setAppearance(mode)
     }
 
     func resetPassword(currentPassword: String, newPassword: String) async -> Bool {
@@ -58,12 +45,13 @@ final class SettingsViewModel: ObservableObject {
 }
 
 /// Appearance mode enum
+@MainActor
 enum AppearanceMode: Int, CaseIterable, Identifiable {
     case system = 0
     case light = 1
     case dark = 2
 
-    var id: Int { rawValue }
+    nonisolated var id: Int { rawValue }
 
     var displayName: String {
         switch self {

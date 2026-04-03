@@ -3,274 +3,272 @@ import AppKit
 
 // MARK: - Unlock View
 
-/// Redesigned unlock screen with gradient lock icon - matches prototype
+/// Redesigned unlock screen with centered single-column composition.
 struct UnlockView: View {
     @StateObject private var viewModel = AuthenticationViewModel()
-    @StateObject private var themeManager = ThemeManager.shared
     @EnvironmentObject var appState: AppState
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            VStack(spacing: 32) {
-                Spacer()
+        AuthScreenScaffold {
+            AuthHero(
+                systemName: "lock.fill",
+                title: "app.title".localized,
+                subtitle: "auth.enterPassword".localized
+            )
 
-                // Gradient lock icon - matches prototype
-                VStack(spacing: 16) {
-                    ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [AppColors.gradientPrimary.opacity(0.2), AppColors.gradientOrange.opacity(0.2)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 120, height: 120)
-
-                        GradientIcon(systemName: "lock.fill", size: 48)
-                    }
-
-                    VStack(spacing: 8) {
-                        Text("app.title".localized)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(AppColors.foreground)
-
-                        Text("auth.enterPassword".localized)
-                            .font(.subheadline)
-                            .foregroundColor(AppColors.mutedForeground)
-                    }
-                }
-
-                // Unlock form - matches prototype styling
-                VStack(spacing: 20) {
-                    // Password input field - matches prototype (rounded-2xl, primary border on focus)
-                    HStack(spacing: 12) {
-                        Image(systemName: "lock")
-                            .foregroundColor(AppColors.mutedForeground)
-                            .frame(width: AppConstants.iconSizeMd)
-
-                        SecureField("auth.password".localized, text: $viewModel.primaryPassword)
-                            .textFieldStyle(.plain)
-                            .font(.body)
-                            .onSubmit {
-                                Task {
-                                    _ = await viewModel.unlockWithPassword()
-                                }
-                            }
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 16)
-                    .frame(height: 56)
-                    .background(AppColors.inputBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(AppColors.primary.opacity(0.3), lineWidth: 2)
-                    )
-
-                    if let error = viewModel.errorMessage {
-                        Text(error)
-                            .font(.caption)
-                            .foregroundColor(AppColors.destructive)
-                    }
-
-                    // Unlock button - matches prototype (rounded-2xl with shadow)
-                    Button {
+            AuthFormColumn {
+                AuthPasswordField(
+                    placeholder: "auth.password".localized,
+                    text: $viewModel.primaryPassword,
+                    showsFocusRing: true,
+                    onSubmit: {
                         Task {
                             _ = await viewModel.unlockWithPassword()
                         }
-                    } label: {
-                        HStack {
-                            if viewModel.isLoading {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: AppColors.primaryForeground))
-                            } else {
-                                Text("auth.unlock".localized)
-                            }
+                    }
+                )
+
+                if let error = viewModel.errorMessage {
+                    AuthInlineMessage(text: error, color: AppColors.destructive)
+                }
+
+                AuthPrimaryActionButton(
+                    title: "auth.unlock".localized,
+                    isLoading: viewModel.isLoading,
+                    action: {
+                        Task {
+                            _ = await viewModel.unlockWithPassword()
                         }
-                        .font(.headline)
-                        .foregroundColor(AppColors.primaryForeground)
-                        .frame(height: AppConstants.buttonHeight)
+                    }
+                )
+                .disabled(viewModel.isLoading)
+
+                if viewModel.isBiometricAvailable {
+                    Button {
+                        Task {
+                            _ = await viewModel.unlockWithBiometric()
+                        }
+                    } label: {
+                        HStack(spacing: AppSpacing.sm) {
+                            Image(systemName: viewModel.biometricType.icon)
+                            Text(viewModel.biometricType.displayName)
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(AppColors.primary)
                         .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 24)
-                        .background(AppColors.primary)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
                     }
                     .buttonStyle(.plain)
-                    .disabled(viewModel.isLoading)
-
-                    // Biometric option
-                    if viewModel.isBiometricAvailable {
-                        Button {
-                            Task {
-                                _ = await viewModel.unlockWithBiometric()
-                            }
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: viewModel.biometricType.icon)
-                                Text(viewModel.biometricType.displayName)
-                            }
-                            .font(.subheadline)
-                            .foregroundColor(AppColors.primary)
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.top, 8)
-                    }
+                    .padding(.top, AppSpacing.xs)
                 }
-                .frame(maxWidth: 400)
-                .padding(.horizontal, 32)
+            }
+        }
+    }
+}
 
-                Spacer()
+// MARK: - Setup View
+
+/// Redesigned setup screen for first-time users.
+struct SetupViewNew: View {
+    @StateObject private var viewModel = AuthenticationViewModel()
+    @EnvironmentObject var appState: AppState
+
+    var body: some View {
+        AuthScreenScaffold {
+            AuthHero(
+                systemName: "lock.shield.fill",
+                title: "auth.welcome".localized,
+                subtitle: "auth.createVaultDesc".localized,
+                multilineSubtitle: true
+            )
+
+            AuthFormColumn {
+                AuthPasswordField(
+                    placeholder: "auth.password".localized,
+                    text: $viewModel.primaryPassword,
+                    showsFocusRing: true
+                )
+
+                AuthPasswordField(
+                    placeholder: "auth.confirmPassword".localized,
+                    text: $viewModel.confirmPassword,
+                    onSubmit: {
+                        Task {
+                            _ = await viewModel.setupPrimaryPassword()
+                        }
+                    }
+                )
+
+                if let error = viewModel.errorMessage {
+                    AuthInlineMessage(text: error, color: AppColors.destructive)
+                }
+
+                AuthInlineMessage(
+                    text: "auth.passwordMinLength".localized,
+                    color: AppColors.mutedForeground
+                )
+
+                AuthPrimaryActionButton(
+                    title: "auth.createVault".localized,
+                    isLoading: viewModel.isLoading,
+                    action: {
+                        Task {
+                            _ = await viewModel.setupPrimaryPassword()
+                        }
+                    }
+                )
+                .disabled(viewModel.isLoading)
+            }
+        }
+    }
+}
+
+// MARK: - Shared Auth Primitives
+
+private struct AuthScreenScaffold<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            VStack(spacing: 0) {
+                Spacer(minLength: AppSpacing.xxxl)
+
+                VStack(spacing: AppSpacing.xxxl) {
+                    content
+                }
+                .frame(maxWidth: 420)
+                .padding(.horizontal, AppSpacing.xxl)
+
+                Spacer(minLength: AppSpacing.xxxl)
             }
 
-            // Theme toggle button (top-right) - matches prototype
             ThemeToggleButton()
-                .padding(24)
+                .padding(AppSpacing.xl)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColors.background)
     }
 }
 
-// MARK: - Setup View
-
-/// Redesigned setup screen for first-time users - matches prototype
-struct SetupViewNew: View {
-    @StateObject private var viewModel = AuthenticationViewModel()
-    @StateObject private var themeManager = ThemeManager.shared
-    @EnvironmentObject var appState: AppState
+private struct AuthHero: View {
+    let systemName: String
+    let title: String
+    let subtitle: String
+    var multilineSubtitle: Bool = false
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            VStack(spacing: 32) {
-                Spacer()
-
-                // Gradient lock icon - matches prototype
-                VStack(spacing: 16) {
-                    ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [AppColors.gradientPrimary.opacity(0.2), AppColors.gradientOrange.opacity(0.2)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 120, height: 120)
-
-                        GradientIcon(systemName: "lock.shield.fill", size: 48)
-                    }
-
-                    VStack(spacing: 8) {
-                        Text("auth.welcome".localized)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(AppColors.foreground)
-
-                        Text("auth.createVaultDesc".localized)
-                            .font(.subheadline)
-                            .foregroundColor(AppColors.mutedForeground)
-                            .multilineTextAlignment(.center)
-                    }
-                }
-
-                // Setup form - matches prototype styling
-                VStack(spacing: 16) {
-                    // Password input field - matches prototype (rounded-2xl)
-                    HStack(spacing: 12) {
-                        Image(systemName: "lock")
-                            .foregroundColor(AppColors.mutedForeground)
-                            .frame(width: AppConstants.iconSizeMd)
-
-                        SecureField("auth.password".localized, text: $viewModel.primaryPassword)
-                            .textFieldStyle(.plain)
-                            .font(.body)
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 16)
-                    .frame(height: 56)
-                    .background(AppColors.inputBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(AppColors.primary.opacity(0.3), lineWidth: 2)
+        VStack(spacing: AppSpacing.lg) {
+            ZStack {
+                RoundedRectangle(cornerRadius: AppConstants.radiusXxl)
+                    .fill(
+                        LinearGradient(
+                            colors: [AppColors.gradientPrimary, AppColors.gradientOrange],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
+                    .frame(width: 108, height: 108)
+                    .shadow(color: AppElevation.buttonShadow, radius: 14, x: 0, y: 8)
 
-                    // Confirm password input field - matches prototype
-                    HStack(spacing: 12) {
-                        Image(systemName: "lock")
-                            .foregroundColor(AppColors.mutedForeground)
-                            .frame(width: AppConstants.iconSizeMd)
-
-                        SecureField("auth.confirmPassword".localized, text: $viewModel.confirmPassword)
-                            .textFieldStyle(.plain)
-                            .font(.body)
-                            .onSubmit {
-                                Task {
-                                    _ = await viewModel.setupPrimaryPassword()
-                                }
-                            }
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 16)
-                    .frame(height: 56)
-                    .background(AppColors.inputBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(AppColors.border, lineWidth: 1)
-                    )
-
-                    if let error = viewModel.errorMessage {
-                        Text(error)
-                            .font(.caption)
-                            .foregroundColor(AppColors.destructive)
-                    }
-
-                    Text("auth.passwordMinLength".localized)
-                        .font(.caption)
-                        .foregroundColor(AppColors.mutedForeground)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    // Create vault button - matches prototype (rounded-2xl with shadow)
-                    Button {
-                        Task {
-                            _ = await viewModel.setupPrimaryPassword()
-                        }
-                    } label: {
-                        HStack {
-                            if viewModel.isLoading {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: AppColors.primaryForeground))
-                            } else {
-                                Text("auth.createVault".localized)
-                            }
-                        }
-                        .font(.headline)
-                        .foregroundColor(AppColors.primaryForeground)
-                        .frame(height: AppConstants.buttonHeight)
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 24)
-                        .background(AppColors.primary)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(viewModel.isLoading)
-                }
-                .frame(maxWidth: 400)
-                .padding(.horizontal, 32)
-
-                Spacer()
+                Image(systemName: systemName)
+                    .font(.system(size: 42, weight: .semibold))
+                    .foregroundColor(AppColors.primaryForeground)
             }
 
-            // Theme toggle button (top-right) - matches prototype
-            ThemeToggleButton()
-                .padding(24)
+            VStack(spacing: AppSpacing.sm) {
+                Text(title)
+                    .font(.system(size: 32, weight: .bold))
+                    .foregroundColor(AppColors.foreground)
+
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundColor(AppColors.mutedForeground)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 320)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(multilineSubtitle ? nil : 2)
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppColors.background)
+        .frame(maxWidth: .infinity)
+    }
+}
+
+private struct AuthFormColumn<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        VStack(spacing: AppSpacing.lg) {
+            content
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+private struct AuthPasswordField: View {
+    let placeholder: String
+    @Binding var text: String
+    var showsFocusRing: Bool = false
+    var onSubmit: (() -> Void)? = nil
+
+    var body: some View {
+        HStack(spacing: AppSpacing.sm) {
+            Image(systemName: "lock")
+                .foregroundColor(AppColors.mutedForeground)
+                .frame(width: AppConstants.iconSizeMd)
+
+            SecureField(placeholder, text: $text)
+                .textFieldStyle(.plain)
+                .font(.body)
+                .onSubmit {
+                    onSubmit?()
+                }
+        }
+        .padding(.horizontal, AppSpacing.xl)
+        .frame(height: 56)
+        .frame(maxWidth: .infinity)
+        .background(AppColors.inputBackground)
+        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
+        .overlay(
+            RoundedRectangle(cornerRadius: AppConstants.radiusXl)
+                .stroke(showsFocusRing ? AppColors.primary.opacity(0.35) : AppColors.border, lineWidth: showsFocusRing ? 2 : 1)
+        )
+    }
+}
+
+private struct AuthPrimaryActionButton: View {
+    let title: String
+    let isLoading: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: AppColors.primaryForeground))
+                } else {
+                    Text(title)
+                }
+            }
+            .font(.headline)
+            .foregroundColor(AppColors.primaryForeground)
+            .frame(height: AppConstants.buttonHeight)
+            .frame(maxWidth: .infinity)
+            .background(AppColors.primary)
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
+            .shadow(color: AppElevation.buttonShadow, radius: 4, x: 0, y: 2)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct AuthInlineMessage: View {
+    let text: String
+    let color: Color
+
+    var body: some View {
+        Text(text)
+            .font(.caption)
+            .foregroundColor(color)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
