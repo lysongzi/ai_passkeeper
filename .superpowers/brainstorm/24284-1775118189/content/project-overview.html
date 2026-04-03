@@ -1,0 +1,60 @@
+<h2>PassKeeper RedesignUI 分析起点</h2>
+<p class="subtitle">先统一目标，再进入原型截图和现有实现差异分析</p>
+
+<div class="cards">
+  <div class="card" data-choice="prototype-first" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">A. 以原型为主</div>
+        <div class="mockup-body">
+          <div class="mock-nav">锁屏页 → 主列表页 → 详情页 → 设置/新增弹窗</div>
+          <div style="display:flex; gap:12px; margin-top:12px;">
+            <div class="mock-sidebar" style="height:180px;">分类 + 列表</div>
+            <div class="mock-content" style="height:180px;">高保真详情与操作区</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>先完整分析原型</h3>
+      <p>运行 RedesignUI、截图保存到 prototype-screenshots，再按页面和交互拆解视觉语言。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="diff-first" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">B. 以差异为主</div>
+        <div class="mockup-body">
+          <div class="split">
+            <div class="mockup"><div class="mockup-header">Prototype</div><div class="mockup-body"><div class="placeholder">视觉基准</div></div></div>
+            <div class="mockup"><div class="mockup-header">SwiftUI</div><div class="mockup-body"><div class="placeholder">当前实现</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>先建立差异矩阵</h3>
+      <p>快速比对结构、视觉和交互，再反推需要补拍哪些原型截图。</p>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons" style="margin-top:24px;">
+  <div class="pros">
+    <h4>我当前建议</h4>
+    <ul>
+      <li>先跑通原型并系统截图</li>
+      <li>再对照 SwiftUI 当前实现做差异清单</li>
+      <li>最后产出高保真还原开发方案</li>
+    </ul>
+  </div>
+  <div class="cons">
+    <h4>已发现的现状问题</h4>
+    <ul>
+      <li>RedesignUI 当前是单文件 App.tsx 原型，未模块化</li>
+      <li>视觉 token 偏暖橙色主题，和产品安全感定位未必完全一致</li>
+      <li>当前 SwiftUI 应用与原型可能存在组件层级和交互状态差异</li>
+    </ul>
+  </div>
+</div>

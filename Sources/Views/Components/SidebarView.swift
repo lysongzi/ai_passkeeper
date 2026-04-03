@@ -67,23 +67,9 @@ struct SidebarViewNew: View {
                 .overlay(AppColors.sidebarBorder)
                 .padding(.horizontal, AppSpacing.sm)
 
-            Button {
+            SidebarSettingsButton {
                 showingSettings = true
-            } label: {
-                HStack(spacing: AppSpacing.sm) {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: AppConstants.iconSizeMd, weight: .medium))
-                    Text("settings.title".localized)
-                        .font(.subheadline.weight(.medium))
-                }
-                .foregroundColor(AppColors.sidebarForeground)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, AppSpacing.md)
-                .frame(height: 44)
-                .background(AppColors.sidebarAccent)
-                .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
             }
-            .buttonStyle(.plain)
             .padding(AppSpacing.sm)
         }
         .frame(minWidth: AppConstants.sidebarMinWidth, idealWidth: AppConstants.sidebarWidth, maxWidth: AppConstants.sidebarMaxWidth)
@@ -99,9 +85,84 @@ struct SidebarViewNew: View {
 // MARK: - Password Row New
 
 /// Redesigned password row with prototype-like selected state.
+private struct SidebarInteractiveBackground: View {
+    let isSelected: Bool
+    let isHovered: Bool
+    let cornerRadius: CGFloat
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: cornerRadius)
+            .fill(backgroundFill)
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .stroke(borderColor, lineWidth: isSelected ? 1.5 : (isHovered ? 1 : 0))
+            )
+    }
+
+    private var backgroundFill: Color {
+        if isSelected {
+            return AppColors.sidebarAccent
+        }
+        if isHovered {
+            return AppColors.sidebarAccent.opacity(0.52)
+        }
+        return .clear
+    }
+
+    private var borderColor: Color {
+        if isSelected {
+            return AppColors.primary.opacity(0.64)
+        }
+        if isHovered {
+            return AppColors.sidebarBorder.opacity(0.82)
+        }
+        return .clear
+    }
+}
+
+private struct SidebarSettingsButton: View {
+    let action: () -> Void
+    @State private var isHovered = false
+    @State private var isPressed = false
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: AppSpacing.sm) {
+                Image(systemName: "gearshape")
+                    .font(.system(size: AppConstants.iconSizeMd, weight: .medium))
+                Text("settings.title".localized)
+                    .font(.subheadline.weight(.medium))
+            }
+            .foregroundColor(AppColors.sidebarForeground)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, AppSpacing.md)
+            .frame(height: 42)
+            .background(
+                SidebarInteractiveBackground(
+                    isSelected: false,
+                    isHovered: isHovered || isPressed,
+                    cornerRadius: AppConstants.radiusMd
+                )
+            )
+            .scaleEffect(isPressed ? 0.985 : 1)
+            .animation(.easeOut(duration: 0.14), value: isPressed)
+        }
+        .buttonStyle(.plain)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in isPressed = true }
+                .onEnded { _ in isPressed = false }
+        )
+        .onHover { hovering in
+            isHovered = hovering
+        }
+    }
+}
+
 struct PasswordRowNew: View {
     let item: DecryptedPasswordItem
     let isSelected: Bool
+    @State private var isHovered = false
 
     var body: some View {
         HStack(spacing: AppSpacing.sm) {
@@ -127,36 +188,34 @@ struct PasswordRowNew: View {
                     )
             }
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(item.title)
-                    .font(.subheadline.weight(.medium))
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(AppColors.sidebarForeground)
                     .lineLimit(1)
 
                 Text(item.username)
-                    .font(.caption)
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundColor(AppColors.mutedForeground)
                     .lineLimit(1)
             }
 
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, AppSpacing.sm)
-        .padding(.vertical, 10)
-        .background(selectionBackground)
-        .overlay(selectionBorder)
+        .padding(.horizontal, AppSpacing.md)
+        .padding(.vertical, 11)
+        .background(
+            SidebarInteractiveBackground(
+                isSelected: isSelected,
+                isHovered: isHovered,
+                cornerRadius: AppConstants.radiusLg
+            )
+        )
         .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusLg))
         .contentShape(RoundedRectangle(cornerRadius: AppConstants.radiusLg))
-    }
-
-    private var selectionBackground: some View {
-        RoundedRectangle(cornerRadius: AppConstants.radiusLg)
-            .fill(isSelected ? AppColors.sidebarAccent : Color.clear)
-    }
-
-    private var selectionBorder: some View {
-        RoundedRectangle(cornerRadius: AppConstants.radiusLg)
-            .stroke(isSelected ? AppColors.primary.opacity(0.55) : Color.clear, lineWidth: 1.5)
+        .onHover { hovering in
+            isHovered = hovering
+        }
     }
 }
 
@@ -166,6 +225,7 @@ struct PasswordRowNew: View {
 struct CategoryRow: View {
     let category: String
     let isSelected: Bool
+    @State private var isHovered = false
 
     var body: some View {
         HStack(spacing: AppSpacing.sm) {
@@ -175,17 +235,23 @@ struct CategoryRow: View {
                 .frame(width: 20)
 
             Text(category)
-                .font(.subheadline)
+                .font(.subheadline.weight(isSelected ? .semibold : .regular))
                 .foregroundColor(isSelected ? AppColors.sidebarPrimary : AppColors.sidebarForeground)
 
             Spacer(minLength: 0)
         }
         .padding(.horizontal, AppSpacing.md)
-        .frame(height: 36)
+        .frame(height: 38)
         .background(
-            RoundedRectangle(cornerRadius: AppConstants.radiusMd)
-                .fill(isSelected ? AppColors.sidebarAccent : Color.clear)
+            SidebarInteractiveBackground(
+                isSelected: isSelected,
+                isHovered: isHovered,
+                cornerRadius: AppConstants.radiusMd
+            )
         )
         .contentShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+        .onHover { hovering in
+            isHovered = hovering
+        }
     }
 }

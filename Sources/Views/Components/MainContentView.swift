@@ -67,7 +67,7 @@ private struct PKVaultToolbar: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(AppColors.primaryForeground)
                 .padding(.horizontal, AppSpacing.lg)
-                .frame(height: 36)
+                .frame(height: 34)
                 .background(AppColors.primary)
                 .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
                 .shadow(color: AppElevation.buttonShadow, radius: 3, x: 0, y: 1)
@@ -81,8 +81,8 @@ private struct PKVaultToolbar: View {
 
             ThemeToggleButton()
         }
-        .padding(.horizontal, AppSpacing.md)
-        .padding(.vertical, AppSpacing.sm)
+        .padding(.horizontal, AppSpacing.lg)
+        .padding(.vertical, 10)
         .background(AppColors.card)
     }
 }
@@ -90,17 +90,47 @@ private struct PKVaultToolbar: View {
 private struct PKToolbarIconButton: View {
     let systemName: String
     let action: () -> Void
+    @State private var isHovered = false
+    @State private var isPressed = false
 
     var body: some View {
         Button(action: action) {
             Image(systemName: systemName)
                 .font(.system(size: AppConstants.iconSizeMd, weight: .medium))
                 .foregroundColor(AppColors.foreground)
-                .frame(width: 36, height: 36)
-                .background(AppColors.accent)
+                .frame(width: 34, height: 34)
+                .background(buttonBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppConstants.radiusMd)
+                        .stroke(buttonBorder, lineWidth: isHovered ? 1 : 0)
+                )
                 .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+                .scaleEffect(isPressed ? 0.97 : 1)
+                .animation(.easeOut(duration: 0.14), value: isPressed)
         }
         .buttonStyle(.plain)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in isPressed = true }
+                .onEnded { _ in isPressed = false }
+        )
+        .onHover { hovering in
+            isHovered = hovering
+        }
+    }
+
+    private var buttonBackground: Color {
+        if isPressed {
+            return AppColors.sidebarAccent
+        }
+        if isHovered {
+            return AppColors.accent.opacity(0.92)
+        }
+        return AppColors.accent
+    }
+
+    private var buttonBorder: Color {
+        isHovered ? AppColors.border.opacity(0.95) : .clear
     }
 }
 
@@ -111,7 +141,7 @@ struct EmptyStateViewNew: View {
     let onAddNew: () -> Void
 
     var body: some View {
-        VStack(spacing: AppSpacing.xl) {
+        VStack(spacing: 26) {
             ZStack {
                 RoundedRectangle(cornerRadius: AppConstants.radiusXxl)
                     .fill(
@@ -121,21 +151,21 @@ struct EmptyStateViewNew: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 92, height: 92)
+                    .frame(width: 88, height: 88)
 
-                GradientIcon(systemName: "key.fill", size: 38)
+                GradientIcon(systemName: "key.fill", size: 34)
             }
 
-            VStack(spacing: AppSpacing.sm) {
+            VStack(spacing: 10) {
                 Text("main.noPasswordSelected".localized)
-                    .font(.system(size: 28, weight: .semibold))
+                    .font(.system(size: 30, weight: .semibold))
                     .foregroundColor(AppColors.foreground)
 
                 Text("main.noPasswordSelectedDesc".localized)
                     .font(.subheadline)
                     .foregroundColor(AppColors.mutedForeground)
                     .multilineTextAlignment(.center)
-                    .frame(maxWidth: 320)
+                    .frame(maxWidth: 336)
             }
 
             Button(action: onAddNew) {
@@ -145,7 +175,7 @@ struct EmptyStateViewNew: View {
                 }
                 .font(.headline)
                 .foregroundColor(AppColors.primaryForeground)
-                .padding(.horizontal, AppSpacing.xl)
+                .padding(.horizontal, 26)
                 .frame(height: AppConstants.buttonHeight)
                 .background(AppColors.primary)
                 .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
@@ -153,8 +183,10 @@ struct EmptyStateViewNew: View {
             }
             .buttonStyle(.plain)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(AppSpacing.xxl)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .padding(.horizontal, 32)
+        .padding(.top, 12)
+        .padding(.bottom, 54)
         .background(AppColors.background)
     }
 }

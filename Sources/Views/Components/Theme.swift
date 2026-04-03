@@ -105,13 +105,13 @@ struct AppColors {
     static let sidebarPrimaryForeground = adaptiveColor(light: Color(hex: "fff7f0"), dark: Color(hex: "1a100a"))
 
     /// Sidebar accent (hover / neutral row)
-    static let sidebarAccent = adaptiveColor(light: Color(hex: "efe5dc"), dark: Color(hex: "241a15"))
+    static let sidebarAccent = adaptiveColor(light: Color(hex: "f3e7dc"), dark: Color(hex: "271c16"))
 
     /// Sidebar accent foreground
     static let sidebarAccentForeground = adaptiveColor(light: Color(hex: "3a291f"), dark: Color(hex: "f2ebe4"))
 
     /// Sidebar border
-    static let sidebarBorder = adaptiveColor(light: Color(hex: "e2d8cf"), dark: Color(hex: "2a1f19"))
+    static let sidebarBorder = adaptiveColor(light: Color(hex: "dfd2c7"), dark: Color(hex: "2d221c"))
 
     // MARK: - Gradient Colors
 
@@ -131,10 +131,10 @@ struct AppConstants {
     static let radiusSm: CGFloat = 6
 
     /// Medium corner radius (8px)
-    static let radiusMd: CGFloat = 8
+    static let radiusMd: CGFloat = 10
 
     /// Large corner radius (10px)
-    static let radiusLg: CGFloat = 10
+    static let radiusLg: CGFloat = 12
 
     /// Extra large corner radius (16px for inputs)
     static let radiusXl: CGFloat = 16

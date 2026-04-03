@@ -49,16 +49,16 @@ struct UnlockView: View {
                             _ = await viewModel.unlockWithBiometric()
                         }
                     } label: {
-                        HStack(spacing: AppSpacing.sm) {
+                        HStack(spacing: 9) {
                             Image(systemName: viewModel.biometricType.icon)
                             Text(viewModel.biometricType.displayName)
                         }
-                        .font(.subheadline)
+                        .font(.system(size: 14, weight: .medium))
                         .foregroundColor(AppColors.primary)
                         .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.plain)
-                    .padding(.top, AppSpacing.xs)
+                    .padding(.top, 2)
                 }
             }
         }
@@ -130,15 +130,16 @@ private struct AuthScreenScaffold<Content: View>: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             VStack(spacing: 0) {
-                Spacer(minLength: AppSpacing.xxxl)
+                Spacer(minLength: 56)
 
-                VStack(spacing: AppSpacing.xxxl) {
+                VStack(spacing: 32) {
                     content
                 }
-                .frame(maxWidth: 420)
+                .frame(maxWidth: 416)
                 .padding(.horizontal, AppSpacing.xxl)
+                .padding(.bottom, 12)
 
-                Spacer(minLength: AppSpacing.xxxl)
+                Spacer(minLength: 52)
             }
 
             ThemeToggleButton()
@@ -156,7 +157,7 @@ private struct AuthHero: View {
     var multilineSubtitle: Bool = false
 
     var body: some View {
-        VStack(spacing: AppSpacing.lg) {
+        VStack(spacing: 18) {
             ZStack {
                 RoundedRectangle(cornerRadius: AppConstants.radiusXxl)
                     .fill(
@@ -166,24 +167,24 @@ private struct AuthHero: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 108, height: 108)
-                    .shadow(color: AppElevation.buttonShadow, radius: 14, x: 0, y: 8)
+                    .frame(width: 104, height: 104)
+                    .shadow(color: AppElevation.buttonShadow.opacity(0.96), radius: 15, x: 0, y: 8)
 
                 Image(systemName: systemName)
-                    .font(.system(size: 42, weight: .semibold))
+                    .font(.system(size: 40, weight: .semibold))
                     .foregroundColor(AppColors.primaryForeground)
             }
 
-            VStack(spacing: AppSpacing.sm) {
+            VStack(spacing: 6) {
                 Text(title)
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(AppColors.foreground)
 
                 Text(subtitle)
                     .font(.subheadline)
-                    .foregroundColor(AppColors.mutedForeground)
+                    .foregroundColor(AppColors.mutedForeground.opacity(0.92))
                     .multilineTextAlignment(.center)
-                    .frame(maxWidth: 320)
+                    .frame(maxWidth: 304)
                     .fixedSize(horizontal: false, vertical: true)
                     .lineLimit(multilineSubtitle ? nil : 2)
             }
@@ -196,7 +197,7 @@ private struct AuthFormColumn<Content: View>: View {
     @ViewBuilder let content: Content
 
     var body: some View {
-        VStack(spacing: AppSpacing.lg) {
+        VStack(spacing: 13) {
             content
         }
         .frame(maxWidth: .infinity)
