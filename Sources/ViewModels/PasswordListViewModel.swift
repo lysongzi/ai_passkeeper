@@ -95,6 +95,24 @@ final class PasswordListViewModel: ObservableObject {
 
     // MARK: - Actions
 
+    func updatePassword(_ item: DecryptedPasswordItem) async {
+        do {
+            try await repository.updateItem(
+                id: item.id,
+                title: item.title,
+                username: item.username,
+                password: item.password,
+                category: item.category,
+                notes: item.notes
+            )
+            if let index = passwords.firstIndex(where: { $0.id == item.id }) {
+                passwords[index] = item
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     func deletePassword(_ item: DecryptedPasswordItem) async {
         do {
             try repository.deleteItem(id: item.id)

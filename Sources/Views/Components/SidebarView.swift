@@ -36,7 +36,7 @@ struct SidebarViewNew: View {
             }
             .frame(maxHeight: .infinity)
 
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 6) {
                 sidebarSectionDivider
 
                 Text("main.categories".localized)
@@ -45,7 +45,7 @@ struct SidebarViewNew: View {
                     .foregroundColor(AppColors.mutedForeground)
                     .padding(.horizontal, 16)
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
                     ForEach(viewModel.categories, id: \.self) { category in
                         CategoryRow(
                             category: category,
@@ -60,7 +60,7 @@ struct SidebarViewNew: View {
                 }
                 .padding(.horizontal, 12)
             }
-            .padding(.bottom, 10)
+            .padding(.bottom, 6)
 
             sidebarSectionDivider
 
@@ -247,7 +247,7 @@ struct CategoryRow: View {
             Spacer(minLength: 0)
         }
         .padding(.horizontal, AppSpacing.md)
-        .frame(height: 36)
+        .frame(height: 30)
         .background(
             SidebarInteractiveBackground(
                 isSelected: isSelected,

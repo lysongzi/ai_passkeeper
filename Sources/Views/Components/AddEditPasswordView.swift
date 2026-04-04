@@ -29,25 +29,18 @@ struct AddEditPasswordViewNew: View {
                         .foregroundColor(AppColors.mutedForeground)
                     },
                     right: {
-                        Button {
+                        PKModalActionButton(
+                            title: "addEdit.save".localized,
+                            isEnabled: viewModel.isValid,
+                            isLoading: viewModel.isSaving
+                        ) {
                             Task {
                                 if await viewModel.save() {
                                     onSave()
                                     dismiss()
                                 }
                             }
-                        } label: {
-                            Text("addEdit.save".localized)
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(AppColors.primaryForeground)
-                                .padding(.horizontal, 16)
-                                .frame(height: 34)
-                                .background(viewModel.isValid ? AppColors.primary : AppColors.muted)
-                                .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
                         }
-                        .buttonStyle(.plain)
-                        .opacity(viewModel.isSaving ? 0.86 : 1)
-                        .disabled(!viewModel.isValid || viewModel.isSaving)
                     }
                 )
 
@@ -56,18 +49,7 @@ struct AddEditPasswordViewNew: View {
                     .frame(height: 1)
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("addEdit.details".localized)
-                                .font(.system(size: 12, weight: .semibold))
-                                .tracking(0.2)
-                                .foregroundColor(AppColors.mutedForeground)
-
-                            Text(editingItem == nil ? "Create a new password entry" : "Update the selected password entry")
-                                .font(.system(size: 13, weight: .regular))
-                                .foregroundColor(AppColors.mutedForeground.opacity(0.92))
-                        }
-
+                    VStack(alignment: .leading, spacing: 20) {
                         if let errorMessage = viewModel.errorMessage, !errorMessage.isEmpty {
                             Text(errorMessage)
                                 .font(.system(size: 13, weight: .medium))
@@ -83,100 +65,60 @@ struct AddEditPasswordViewNew: View {
                                 )
                         }
 
-                        VStack(spacing: 18) {
-                            formRow(label: "addEdit.titleField".localized, icon: "textformat") {
-                                TextField("addEdit.titleField".localized, text: $viewModel.title)
+                        fieldSection(title: "addEdit.titleField".localized, required: true) {
+                            PKFieldContainer {
+                                TextField(text: $viewModel.title, prompt: Text("addEdit.placeholder.title".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
                                     .textFieldStyle(.plain)
                                     .font(.system(size: 14, weight: .medium))
                             }
+                        }
 
-                            formRow(label: "addEdit.username".localized, icon: "person") {
-                                TextField("addEdit.username".localized, text: $viewModel.username)
+                        fieldSection(title: "addEdit.username".localized, required: true) {
+                            PKFieldContainer {
+                                TextField(text: $viewModel.username, prompt: Text("addEdit.placeholder.username".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
                                     .textFieldStyle(.plain)
                                     .font(.system(size: 14, weight: .medium))
                             }
+                        }
 
-                            PKFormRowRightLabel("detail.password".localized, labelWidth: 118, spacing: 16) {
-                                HStack(spacing: AppSpacing.sm) {
-                                    PKFieldContainer {
-                                        HStack(spacing: AppSpacing.sm) {
-                                            Image(systemName: "lock")
-                                                .font(.system(size: 14, weight: .medium))
-                                                .foregroundColor(AppColors.mutedForeground)
-                                                .frame(width: 18)
-
-                                            Group {
-                                                if viewModel.showPassword {
-                                                    TextField("detail.password".localized, text: $viewModel.password)
-                                                } else {
-                                                    SecureField("detail.password".localized, text: $viewModel.password)
-                                                }
-                                            }
-                                            .textFieldStyle(.plain)
-                                            .font(.system(size: 14, weight: .medium))
+                        fieldSection(title: "detail.password".localized, required: true) {
+                            HStack(spacing: AppSpacing.sm) {
+                                PKFieldContainer {
+                                    Group {
+                                        if viewModel.showPassword {
+                                            TextField(text: $viewModel.password, prompt: Text("addEdit.placeholder.password".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
+                                        } else {
+                                            SecureField(text: $viewModel.password, prompt: Text("addEdit.placeholder.password".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
                                         }
                                     }
-
-                                    TogglePasswordButton(isSecure: $viewModel.showPassword)
-                                        .frame(width: 30, height: 30)
-                                        .background(AppColors.accent.opacity(0.72))
-                                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+                                    .textFieldStyle(.plain)
+                                    .font(.system(size: 14, weight: .medium))
                                 }
+
+                                TogglePasswordButton(isSecure: $viewModel.showPassword)
                             }
+                        }
 
-                            PKFormRowRightLabel("addEdit.category".localized, labelWidth: 118, spacing: 16) {
-                                Menu {
-                                    ForEach(viewModel.categories, id: \.self) { category in
-                                        Button {
-                                            viewModel.category = category
-                                        } label: {
-                                            HStack {
-                                                Image(systemName: categoryIcon(for: category))
-                                                Text(category)
-                                            }
-                                        }
-                                    }
-                                } label: {
-                                    PKFieldContainer {
-                                        HStack(spacing: AppSpacing.sm) {
-                                            Image(systemName: categoryIcon(for: viewModel.category))
-                                                .font(.system(size: 14, weight: .semibold))
-                                                .foregroundColor(AppColors.sidebarPrimary)
-                                                .frame(width: 18)
+                        fieldSection(title: "addEdit.category".localized, required: true) {
+                            PKCategoryPicker(
+                                categories: viewModel.categories,
+                                selection: $viewModel.category
+                            )
+                        }
 
-                                            Text(viewModel.category)
-                                                .font(.system(size: 14, weight: .medium))
-                                                .foregroundColor(AppColors.foreground)
-
-                                            Spacer(minLength: 0)
-
-                                            Image(systemName: "chevron.up.chevron.down")
-                                                .font(.system(size: 12, weight: .medium))
-                                                .foregroundColor(AppColors.mutedForeground)
-                                        }
-                                    }
-                                }
-                                .menuStyle(.borderlessButton)
-                            }
-
-                            PKFormRowRightLabel(
-                                "detail.notes".localized,
-                                labelWidth: 118,
-                                spacing: 16,
-                                verticalAlignment: .top
-                            ) {
-                                TextEditor(text: $viewModel.notes)
-                                    .font(.system(size: 14, weight: .regular))
-                                    .frame(minHeight: 132)
-                                    .scrollContentBackground(.hidden)
-                                    .padding(10)
-                                    .background(AppColors.inputBackground)
-                                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: AppConstants.radiusMd)
-                                            .stroke(AppColors.border, lineWidth: 1)
-                                    )
-                            }
+                        fieldSection(title: "detail.notes".localized, optional: true) {
+                            TextEditor(text: $viewModel.notes)
+                                .font(.system(size: 14, weight: .regular))
+                                .frame(minHeight: 66)
+                                .scrollContentBackground(.hidden)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 10)
+                                .background(AppColors.inputBackground)
+                                .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: AppConstants.radiusMd)
+                                        .stroke(AppColors.border, lineWidth: 1)
+                                )
                         }
                     }
                     .padding(.horizontal, 30)
@@ -184,7 +126,7 @@ struct AddEditPasswordViewNew: View {
                     .padding(.bottom, 28)
                 }
             }
-            .frame(width: 572, height: 596)
+            .frame(width: 572, height: 648)
             .background(AppColors.popover)
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             .overlay(
@@ -200,18 +142,31 @@ struct AddEditPasswordViewNew: View {
         }
     }
 
-    private func formRow<Field: View>(label: String, icon: String, @ViewBuilder field: () -> Field) -> some View {
-        PKFormRowRightLabel(label, labelWidth: 118, spacing: 16) {
-            PKFieldContainer {
-                HStack(spacing: AppSpacing.sm) {
-                    Image(systemName: icon)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(AppColors.mutedForeground)
-                        .frame(width: 18)
-
-                    field()
+    private func fieldSection<Content: View>(
+        title: String,
+        required: Bool = false,
+        optional: Bool = false,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 9) {
+            HStack(spacing: 5) {
+                if required {
+                    Circle()
+                        .fill(Color.red)
+                        .frame(width: 5, height: 5)
+                }
+                Text(title)
+                    .font(.system(size: 12, weight: .semibold))
+                    .tracking(0.2)
+                    .foregroundColor(AppColors.mutedForeground)
+                if optional {
+                    Text("（选填）")
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundColor(AppColors.mutedForeground.opacity(0.7))
                 }
             }
+
+            content()
         }
     }
 }

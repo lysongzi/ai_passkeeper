@@ -7,7 +7,7 @@ import AppKit
 struct PasswordDetailViewNew: View {
     let item: DecryptedPasswordItem
     let onDelete: () -> Void
-    let onSave: () -> Void
+    let onSave: (DecryptedPasswordItem) async -> Void
 
     @State private var showPassword = false
     @State private var showingDeleteConfirmation = false
@@ -96,26 +96,10 @@ struct PasswordDetailViewNew: View {
                         title: "addEdit.category".localized,
                         content: {
                             if isEditing {
-                                Menu {
-                                    ForEach(categories, id: \.self) { category in
-                                        Button(category) {
-                                            editedCategory = category
-                                        }
-                                    }
-                                } label: {
-                                    PKFieldContainer {
-                                        HStack(alignment: .firstTextBaseline) {
-                                            Text(editedCategory)
-                                                .font(.system(size: 14, weight: .medium))
-                                                .foregroundColor(AppColors.foreground)
-                                            Spacer()
-                                            Image(systemName: "chevron.up.chevron.down")
-                                                .font(.system(size: 12, weight: .medium))
-                                                .foregroundColor(AppColors.mutedForeground)
-                                        }
-                                    }
-                                }
-                                .menuStyle(.borderlessButton)
+                                PKCategoryPicker(
+                                    categories: categories,
+                                    selection: $editedCategory
+                                )
                             } else {
                                 PKFieldContainer {
                                     HStack(spacing: AppSpacing.sm) {
@@ -139,9 +123,10 @@ struct PasswordDetailViewNew: View {
                                 if isEditing {
                                     TextEditor(text: $editedNotes)
                                         .font(.system(size: 14, weight: .regular))
-                                        .frame(minHeight: 132)
+                                        .frame(minHeight: 66)
                                         .scrollContentBackground(.hidden)
-                                        .padding(AppSpacing.xs)
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
                                         .background(AppColors.inputBackground)
                                         .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
                                         .overlay(
@@ -149,7 +134,7 @@ struct PasswordDetailViewNew: View {
                                                 .stroke(AppColors.border, lineWidth: 1)
                                         )
                                 } else {
-                                    PKFieldContainer(minHeight: 132) {
+                                    PKFieldContainer(minHeight: 66) {
                                         Text(item.notes)
                                             .font(.system(size: 14, weight: .regular))
                                             .foregroundColor(AppColors.foreground)
@@ -212,16 +197,10 @@ struct PasswordDetailViewNew: View {
                 if isEditing {
                     editableTitleField
                 } else {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(item.title)
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(AppColors.foreground)
-                            .lineLimit(2)
-
-                        Text(localizedCategory)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(AppColors.mutedForeground)
-                    }
+                    Text(item.title)
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(AppColors.foreground)
+                        .lineLimit(2)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -247,7 +226,7 @@ struct PasswordDetailViewNew: View {
                 Button("detail.cancel".localized) {
                     cancelEditing()
                 }
-                .buttonStyle(SecondaryButtonStyle())
+                .buttonStyle(DetailActionButtonStyle())
 
                 Button("addEdit.save".localized) {
                     saveChanges()
@@ -263,7 +242,7 @@ struct PasswordDetailViewNew: View {
                         Text("detail.edit".localized)
                     }
                 }
-                .buttonStyle(SecondaryButtonStyle())
+                .buttonStyle(DetailActionButtonStyle())
             }
         }
         .frame(maxWidth: 232)
@@ -359,9 +338,24 @@ struct PasswordDetailViewNew: View {
     }
 
     private func saveChanges() {
+        let categoryRawValue = PasswordCategory.allCases.first(where: { $0.localizedName == editedCategory })?.rawValue ?? editedCategory
+
+        let updatedItem = DecryptedPasswordItem(
+            id: item.id,
+            category: categoryRawValue,
+            title: editedTitle.trimmingCharacters(in: .whitespaces),
+            username: editedUsername,
+            password: editedPassword,
+            notes: editedNotes,
+            createdAt: item.createdAt,
+            updatedAt: Date()
+        )
+
         isSaving = true
-        onSave()
-        isSaving = false
-        isEditing = false
+        Task {
+            await onSave(updatedItem)
+            isSaving = false
+            isEditing = false
+        }
     }
 }
