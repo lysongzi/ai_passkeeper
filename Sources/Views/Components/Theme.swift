@@ -31,19 +31,19 @@ struct AppColors {
     // MARK: - Base Colors
 
     /// Main background color (window backdrop)
-    static let background = adaptiveColor(light: Color(hex: "fdf7f0"), dark: Color(hex: "0f0b09"))
+    static let background = adaptiveColor(light: Color(hex: "f7f4f1"), dark: Color(hex: "14110f"))
 
     /// Main foreground/text color
-    static let foreground = adaptiveColor(light: Color(hex: "2a1d15"), dark: Color(hex: "f9f3ec"))
+    static let foreground = adaptiveColor(light: Color(hex: "2c211b"), dark: Color(hex: "f6f1eb"))
 
     /// Card background color
-    static let card = adaptiveColor(light: Color(hex: "ffffff"), dark: Color(hex: "19130f"))
+    static let card = adaptiveColor(light: Color(hex: "fffdfa"), dark: Color(hex: "19130f"))
 
     /// Card foreground color
     static let cardForeground = adaptiveColor(light: Color(hex: "2a1d15"), dark: Color(hex: "f9f3ec"))
 
     /// Popover background color
-    static let popover = adaptiveColor(light: Color(hex: "fffbf7"), dark: Color(hex: "1d1612"))
+    static let popover = adaptiveColor(light: Color(hex: "fffaf6"), dark: Color(hex: "1d1612"))
 
     /// Popover foreground
     static let popoverForeground = adaptiveColor(light: Color(hex: "2a1d15"), dark: Color(hex: "f9f3ec"))
@@ -55,19 +55,19 @@ struct AppColors {
     static let primaryForeground = adaptiveColor(light: Color(hex: "ffffff"), dark: Color(hex: "ffffff"))
 
     /// Secondary color (soft surfaces)
-    static let secondary = adaptiveColor(light: Color(hex: "f5ede4"), dark: Color(hex: "201712"))
+    static let secondary = adaptiveColor(light: Color(hex: "f4ebe2"), dark: Color(hex: "201712"))
 
     /// Secondary foreground
     static let secondaryForeground = adaptiveColor(light: Color(hex: "433127"), dark: Color(hex: "f9f3ec"))
 
     /// Muted background
-    static let muted = adaptiveColor(light: Color(hex: "efe6de"), dark: Color(hex: "241a15"))
+    static let muted = adaptiveColor(light: Color(hex: "eee5dc"), dark: Color(hex: "241a15"))
 
     /// Muted foreground
-    static let mutedForeground = adaptiveColor(light: Color(hex: "796556"), dark: Color(hex: "b29a8d"))
+    static let mutedForeground = adaptiveColor(light: Color(hex: "8f8175"), dark: Color(hex: "94857a"))
 
     /// Accent background (icon buttons / hover)
-    static let accent = adaptiveColor(light: Color(hex: "f5ede6"), dark: Color(hex: "241a15"))
+    static let accent = adaptiveColor(light: Color(hex: "f2e9e1"), dark: Color(hex: "241a15"))
 
     /// Accent foreground
     static let accentForeground = adaptiveColor(light: Color(hex: "2a1d15"), dark: Color(hex: "f9f3ec"))
@@ -80,12 +80,12 @@ struct AppColors {
 
     /// Border color with calibrated opacity semantics (panels / cards)
     static let border = adaptiveColor(
-        light: Color(hex: "2a1d15").opacity(0.14),
+        light: Color(hex: "5c4031").opacity(0.12),
         dark: Color(hex: "f9f3ec").opacity(0.12)
     )
 
     /// Input background fill
-    static let inputBackground = adaptiveColor(light: Color(hex: "f7f0ea"), dark: Color(hex: "201712"))
+    static let inputBackground = adaptiveColor(light: Color(hex: "f3eeea"), dark: Color(hex: "282221"))
 
     /// Ring color (focus ring)
     static let ring = adaptiveColor(light: Color(hex: "f97316").opacity(0.55), dark: Color(hex: "f97316"))
@@ -93,25 +93,25 @@ struct AppColors {
     // MARK: - Sidebar Colors
 
     /// Sidebar background
-    static let sidebar = adaptiveColor(light: Color(hex: "f9f1ea"), dark: Color(hex: "16110d"))
+    static let sidebar = adaptiveColor(light: Color(hex: "f6eee7"), dark: Color(hex: "16110d"))
 
     /// Sidebar foreground
-    static let sidebarForeground = adaptiveColor(light: Color(hex: "3a291f"), dark: Color(hex: "f2ebe4"))
+    static let sidebarForeground = adaptiveColor(light: Color(hex: "33251e"), dark: Color(hex: "f2ebe4"))
 
     /// Sidebar primary color (selected row background)
-    static let sidebarPrimary = adaptiveColor(light: Color(hex: "d47532"), dark: Color(hex: "f97316"))
+    static let sidebarPrimary = adaptiveColor(light: Color(hex: "d67a38"), dark: Color(hex: "f97316"))
 
     /// Sidebar primary foreground
     static let sidebarPrimaryForeground = adaptiveColor(light: Color(hex: "fff7f0"), dark: Color(hex: "1a100a"))
 
     /// Sidebar accent (hover / neutral row)
-    static let sidebarAccent = adaptiveColor(light: Color(hex: "f3e7dc"), dark: Color(hex: "271c16"))
+    static let sidebarAccent = adaptiveColor(light: Color(hex: "efe4d8"), dark: Color(hex: "271c16"))
 
     /// Sidebar accent foreground
     static let sidebarAccentForeground = adaptiveColor(light: Color(hex: "3a291f"), dark: Color(hex: "f2ebe4"))
 
     /// Sidebar border
-    static let sidebarBorder = adaptiveColor(light: Color(hex: "dfd2c7"), dark: Color(hex: "2d221c"))
+    static let sidebarBorder = adaptiveColor(light: Color(hex: "dfd1c3"), dark: Color(hex: "2d221c"))
 
     // MARK: - Gradient Colors
 
@@ -120,6 +120,36 @@ struct AppColors {
 
     /// Primary gradient end
     static let gradientOrange = Color(hex: "fb923c")
+
+    // MARK: - Auth Screen Colors
+
+    static let authSubtitle = adaptiveColor(light: Color(hex: "8c7f74"), dark: Color(hex: "82776f"))
+
+    static let authFieldBackground = adaptiveColor(light: Color(hex: "fbf8f5"), dark: Color(hex: "2a2423"))
+
+    static let authFieldBorder = adaptiveColor(
+        light: Color(hex: "f97316").opacity(0.22),
+        dark: Color(hex: "f97316").opacity(0.34)
+    )
+
+    static let authFieldBorderFocused = adaptiveColor(
+        light: Color(hex: "f97316").opacity(0.32),
+        dark: Color(hex: "fb923c").opacity(0.56)
+    )
+
+    static let authSecondaryAction = adaptiveColor(light: Color(hex: "a65a28"), dark: Color(hex: "dc9a6d"))
+}
+
+// MARK: - Testable Light Palette
+
+struct AppThemeLightPalette {
+    static let backgroundHex = "f7f4f1"
+    static let cardHex = "fffdfa"
+    static let popoverHex = "fffaf6"
+    static let inputBackgroundHex = "f3eeea"
+    static let sidebarHex = "f6eee7"
+    static let sidebarAccentHex = "efe4d8"
+    static let mutedForegroundHex = "8f8175"
 }
 
 // MARK: - Design System Constants
@@ -186,9 +216,12 @@ struct AppSpacing {
 }
 
 struct AppElevation {
-    static let buttonShadow = Color.black.opacity(0.15)
-    static let windowShadow = Color.black.opacity(0.28)
-    static let modalShadow = Color.black.opacity(0.32)
+    static let buttonShadow = adaptiveColor(light: Color.black.opacity(0.10), dark: Color.black.opacity(0.15))
+    static let windowShadow = adaptiveColor(light: Color.black.opacity(0.08), dark: Color.black.opacity(0.28))
+    static let modalShadow = adaptiveColor(light: Color.black.opacity(0.10), dark: Color.black.opacity(0.32))
+    static let authHeroShadow = adaptiveColor(light: Color.black.opacity(0.08), dark: Color.black.opacity(0.28))
+    static let authButtonShadow = adaptiveColor(light: Color(hex: "d96a2a").opacity(0.24), dark: Color.black.opacity(0.28))
+    static let authFieldShadow = adaptiveColor(light: Color.black.opacity(0.03), dark: Color.clear)
 }
 
 // MARK: - Color Extension

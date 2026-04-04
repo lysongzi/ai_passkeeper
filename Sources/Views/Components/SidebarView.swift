@@ -15,12 +15,12 @@ struct SidebarViewNew: View {
                 text: $viewModel.searchText,
                 icon: "magnifyingglass"
             )
-            .padding(.horizontal, AppSpacing.sm)
-            .padding(.top, AppSpacing.sm)
-            .padding(.bottom, AppSpacing.md)
+            .padding(.horizontal, 12)
+            .padding(.top, 14)
+            .padding(.bottom, 14)
 
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: AppSpacing.xs) {
+                LazyVStack(alignment: .leading, spacing: 4) {
                     ForEach(viewModel.passwords, id: \.id) { item in
                         PasswordRowNew(
                             item: item,
@@ -31,22 +31,21 @@ struct SidebarViewNew: View {
                         }
                     }
                 }
-                .padding(.horizontal, AppSpacing.sm)
-                .padding(.bottom, AppSpacing.lg)
+                .padding(.horizontal, 12)
+                .padding(.bottom, 18)
             }
             .frame(maxHeight: .infinity)
 
-            VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                Divider()
-                    .overlay(AppColors.sidebarBorder)
-                    .padding(.horizontal, AppSpacing.sm)
+            VStack(alignment: .leading, spacing: 10) {
+                sidebarSectionDivider
 
                 Text("main.categories".localized)
-                    .font(.caption.weight(.medium))
+                    .font(.system(size: 11, weight: .semibold))
+                    .tracking(0.3)
                     .foregroundColor(AppColors.mutedForeground)
-                    .padding(.horizontal, AppSpacing.md)
+                    .padding(.horizontal, 16)
 
-                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                VStack(alignment: .leading, spacing: 4) {
                     ForEach(viewModel.categories, id: \.self) { category in
                         CategoryRow(
                             category: category,
@@ -59,18 +58,18 @@ struct SidebarViewNew: View {
                         }
                     }
                 }
-                .padding(.horizontal, AppSpacing.sm)
+                .padding(.horizontal, 12)
             }
-            .padding(.bottom, AppSpacing.sm)
+            .padding(.bottom, 10)
 
-            Divider()
-                .overlay(AppColors.sidebarBorder)
-                .padding(.horizontal, AppSpacing.sm)
+            sidebarSectionDivider
 
             SidebarSettingsButton {
                 showingSettings = true
             }
-            .padding(AppSpacing.sm)
+            .padding(.horizontal, 12)
+            .padding(.top, 10)
+            .padding(.bottom, 12)
         }
         .frame(minWidth: AppConstants.sidebarMinWidth, idealWidth: AppConstants.sidebarWidth, maxWidth: AppConstants.sidebarMaxWidth)
         .background(AppColors.sidebar)
@@ -79,6 +78,13 @@ struct SidebarViewNew: View {
                 .fill(AppColors.sidebarBorder)
                 .frame(width: 1)
         }
+    }
+
+    private var sidebarSectionDivider: some View {
+        Rectangle()
+            .fill(AppColors.sidebarBorder.opacity(0.9))
+            .frame(height: 1)
+            .padding(.horizontal, 12)
     }
 }
 
@@ -136,7 +142,7 @@ private struct SidebarSettingsButton: View {
             .foregroundColor(AppColors.sidebarForeground)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, AppSpacing.md)
-            .frame(height: 42)
+            .frame(height: 40)
             .background(
                 SidebarInteractiveBackground(
                     isSelected: false,
@@ -175,7 +181,7 @@ struct PasswordRowNew: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 40, height: 40)
+                    .frame(width: 38, height: 38)
 
                 Image(systemName: categoryIcon(for: item.category))
                     .font(.system(size: AppConstants.iconSizeSm, weight: .semibold))
@@ -203,7 +209,7 @@ struct PasswordRowNew: View {
             Spacer(minLength: 0)
         }
         .padding(.horizontal, AppSpacing.md)
-        .padding(.vertical, 11)
+        .padding(.vertical, 10)
         .background(
             SidebarInteractiveBackground(
                 isSelected: isSelected,
@@ -241,7 +247,7 @@ struct CategoryRow: View {
             Spacer(minLength: 0)
         }
         .padding(.horizontal, AppSpacing.md)
-        .frame(height: 38)
+        .frame(height: 36)
         .background(
             SidebarInteractiveBackground(
                 isSelected: isSelected,

@@ -53,12 +53,13 @@ struct SettingsViewNew: View {
                                     await resetPassword()
                                 }
                             }
-                            .font(.headline)
+                            .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(AppColors.primaryForeground)
-                            .padding(.horizontal, AppSpacing.lg)
+                            .padding(.horizontal, 16)
                             .frame(height: 34)
                             .background(isResetValid ? AppColors.primary : AppColors.muted)
-                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+                            .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+                            .opacity(isResetting ? 0.86 : 1)
                             .disabled(!isResetValid || isResetting)
                         }
                     }
@@ -77,10 +78,14 @@ struct SettingsViewNew: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(width: 560, height: 548)
+            .frame(width: 572, height: 596)
             .background(AppColors.popover)
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
-            .shadow(color: AppElevation.modalShadow, radius: 20, x: 0, y: 8)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .stroke(AppColors.border, lineWidth: 1)
+            )
+            .shadow(color: AppElevation.modalShadow, radius: 22, x: 0, y: 10)
         }
     }
 
@@ -152,7 +157,7 @@ struct SettingsViewNew: View {
                     }
                 )
             }
-            .padding(.horizontal, 28)
+            .padding(.horizontal, 30)
             .padding(.vertical, 24)
         }
     }
@@ -187,7 +192,7 @@ struct SettingsViewNew: View {
                     }
                 )
             }
-            .padding(.horizontal, 28)
+            .padding(.horizontal, 30)
             .padding(.vertical, 24)
         }
     }
@@ -195,7 +200,8 @@ struct SettingsViewNew: View {
     private func settingsSection<Rows: View>(title: String, @ViewBuilder rows: () -> Rows) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             Text(title)
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: 12, weight: .semibold))
+                .tracking(0.2)
                 .foregroundColor(AppColors.mutedForeground)
 
             PKMetadataPanel {
@@ -215,19 +221,29 @@ struct SettingsViewNew: View {
         }
         .labelsHidden()
         .pickerStyle(.menu)
-        .frame(width: 188, alignment: .trailing)
+        .frame(width: 196, alignment: .trailing)
+        .padding(.horizontal, 14)
+        .frame(height: AppConstants.inputHeight)
+        .background(AppColors.inputBackground)
+        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+        .overlay(
+            RoundedRectangle(cornerRadius: AppConstants.radiusMd)
+                .stroke(AppColors.border, lineWidth: 1)
+        )
     }
 
     private func resetPasswordField(label: String, text: Binding<String>, icon: String) -> some View {
-        PKFormRowRightLabel(label, labelWidth: 140) {
+        PKFormRowRightLabel(label, labelWidth: 140, spacing: 16) {
             PKFieldContainer {
                 HStack(spacing: AppSpacing.sm) {
                     Image(systemName: icon)
+                        .font(.system(size: 14, weight: .medium))
                         .foregroundColor(AppColors.mutedForeground)
-                        .frame(width: AppConstants.iconSizeMd)
+                        .frame(width: 18)
 
                     SecureField(label, text: text)
                         .textFieldStyle(.plain)
+                        .font(.system(size: 14, weight: .medium))
                 }
             }
         }

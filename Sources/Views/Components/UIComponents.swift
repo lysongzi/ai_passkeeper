@@ -43,15 +43,7 @@ struct ModalContainer<Content: View>: View {
     }
 
     var body: some View {
-        ZStack {
-            // Semi-transparent background
-            Color.black.opacity(0.4)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    onDismiss()
-                }
-
-            // Modal content
+        PKModalContainer(onDismiss: onDismiss) {
             content
         }
     }
@@ -80,21 +72,16 @@ struct ModalCard<Content: View>: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header
-            HStack {
-                Spacer()
-
-                Text(title)
-                    .font(.headline)
-                    .foregroundColor(AppColors.foreground)
-
-                Spacer()
+            PKModalHeader(title: title) {
+                Color.clear.frame(width: 32, height: 32)
+            } right: {
+                Color.clear.frame(width: 32, height: 32)
             }
-            .padding(16)
 
-            Divider()
+            Rectangle()
+                .fill(AppColors.border)
+                .frame(height: 1)
 
-            // Content
             if let height = height {
                 content
                     .frame(height: height)
@@ -104,8 +91,12 @@ struct ModalCard<Content: View>: View {
         }
         .frame(width: width)
         .background(AppColors.popover)
-        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
-        .shadow(color: Color.black.opacity(0.2), radius: 20)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(AppColors.border, lineWidth: 1)
+        )
+        .shadow(color: AppElevation.modalShadow, radius: 22, x: 0, y: 10)
     }
 }
 
@@ -119,33 +110,34 @@ struct ModalHeader: View {
     var isSaveEnabled: Bool = true
 
     var body: some View {
-        HStack {
-            Button {
-                cancelAction()
-            } label: {
-                Text("common.cancel".localized)
+        PKModalHeader(
+            title: title,
+            left: {
+                Button {
+                    cancelAction()
+                } label: {
+                    Text("common.cancel".localized)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(AppColors.mutedForeground)
+                }
+                .buttonStyle(.plain)
+            },
+            right: {
+                Button {
+                    saveAction()
+                } label: {
+                    Text("common.save".localized)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(AppColors.primaryForeground)
+                        .padding(.horizontal, 16)
+                        .frame(height: 34)
+                        .background(isSaveEnabled ? AppColors.primary : AppColors.muted)
+                        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .disabled(!isSaveEnabled)
             }
-            .buttonStyle(.plain)
-            .foregroundColor(AppColors.mutedForeground)
-
-            Spacer()
-
-            Text(title)
-                .font(.headline)
-                .foregroundColor(AppColors.foreground)
-
-            Spacer()
-
-            Button {
-                saveAction()
-            } label: {
-                Text("common.save".localized)
-            }
-            .buttonStyle(PrimaryButtonStyle())
-            .frame(width: 80)
-            .disabled(!isSaveEnabled)
-        }
-        .padding(16)
+        )
     }
 }
 
@@ -162,25 +154,9 @@ struct SectionCard<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if let title = title {
-                Text(title)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(AppColors.mutedForeground)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
-                    .padding(.bottom, 8)
-            }
-
+        PKMetadataPanel(title: title) {
             content
         }
-        .background(AppColors.card)
-        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusLg))
-        .overlay(
-            RoundedRectangle(cornerRadius: AppConstants.radiusLg)
-                .stroke(AppColors.border, lineWidth: 1)
-        )
     }
 }
 
@@ -203,24 +179,31 @@ struct SettingRow<Content: View>: View {
     }
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
+        HStack(spacing: 14) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .font(.subheadline)
+                    .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppColors.foreground)
 
                 if let subtitle = subtitle {
                     Text(subtitle)
-                        .font(.caption)
+                        .font(.system(size: 12, weight: .regular))
                         .foregroundColor(AppColors.mutedForeground)
                 }
             }
 
-            Spacer()
+            Spacer(minLength: 0)
 
             content
         }
-        .padding(16)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(AppColors.inputBackground)
+        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+        .overlay(
+            RoundedRectangle(cornerRadius: AppConstants.radiusMd)
+                .stroke(AppColors.border, lineWidth: 1)
+        )
     }
 }
 
@@ -243,7 +226,16 @@ struct SettingPicker<SelectionValue: Hashable, Content: View>: View {
         Picker("", selection: selection) {
             content
         }
+        .labelsHidden()
         .pickerStyle(.menu)
+        .padding(.horizontal, 14)
+        .frame(height: AppConstants.inputHeight)
+        .background(AppColors.inputBackground)
+        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+        .overlay(
+            RoundedRectangle(cornerRadius: AppConstants.radiusMd)
+                .stroke(AppColors.border, lineWidth: 1)
+        )
     }
 }
 
