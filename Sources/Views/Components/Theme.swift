@@ -43,7 +43,7 @@ struct AppColors {
     static let cardForeground = adaptiveColor(light: Color(hex: "2a1d15"), dark: Color(hex: "f9f3ec"))
 
     /// Popover background color
-    static let popover = adaptiveColor(light: Color(hex: "fffaf4"), dark: Color(hex: "1d1612"))
+    static let popover = adaptiveColor(light: Color(hex: "fffbf7"), dark: Color(hex: "1d1612"))
 
     /// Popover foreground
     static let popoverForeground = adaptiveColor(light: Color(hex: "2a1d15"), dark: Color(hex: "f9f3ec"))
@@ -64,10 +64,10 @@ struct AppColors {
     static let muted = adaptiveColor(light: Color(hex: "efe6de"), dark: Color(hex: "241a15"))
 
     /// Muted foreground
-    static let mutedForeground = adaptiveColor(light: Color(hex: "7c675a"), dark: Color(hex: "b29a8d"))
+    static let mutedForeground = adaptiveColor(light: Color(hex: "796556"), dark: Color(hex: "b29a8d"))
 
     /// Accent background (icon buttons / hover)
-    static let accent = adaptiveColor(light: Color(hex: "f3ebe2"), dark: Color(hex: "241a15"))
+    static let accent = adaptiveColor(light: Color(hex: "f5ede6"), dark: Color(hex: "241a15"))
 
     /// Accent foreground
     static let accentForeground = adaptiveColor(light: Color(hex: "2a1d15"), dark: Color(hex: "f9f3ec"))
@@ -80,12 +80,12 @@ struct AppColors {
 
     /// Border color with calibrated opacity semantics (panels / cards)
     static let border = adaptiveColor(
-        light: Color(hex: "2a1d15").opacity(0.16),
+        light: Color(hex: "2a1d15").opacity(0.14),
         dark: Color(hex: "f9f3ec").opacity(0.12)
     )
 
     /// Input background fill
-    static let inputBackground = adaptiveColor(light: Color(hex: "f6efe8"), dark: Color(hex: "201712"))
+    static let inputBackground = adaptiveColor(light: Color(hex: "f7f0ea"), dark: Color(hex: "201712"))
 
     /// Ring color (focus ring)
     static let ring = adaptiveColor(light: Color(hex: "f97316").opacity(0.55), dark: Color(hex: "f97316"))

@@ -39,7 +39,7 @@ struct AddEditPasswordViewNew: View {
                         .font(.headline)
                         .foregroundColor(AppColors.primaryForeground)
                         .padding(.horizontal, AppSpacing.lg)
-                        .frame(height: 36)
+                        .frame(height: 34)
                         .background(viewModel.isValid ? AppColors.primary : AppColors.muted)
                         .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
                         .disabled(!viewModel.isValid || viewModel.isSaving)
@@ -50,9 +50,9 @@ struct AddEditPasswordViewNew: View {
                     .overlay(AppColors.border)
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                    VStack(alignment: .leading, spacing: 26) {
                         Text("addEdit.details".localized)
-                            .font(.subheadline.weight(.medium))
+                            .font(.system(size: 13, weight: .medium))
                             .foregroundColor(AppColors.mutedForeground)
 
                         PKFormRowRightLabel("addEdit.titleField".localized) {
@@ -144,11 +144,11 @@ struct AddEditPasswordViewNew: View {
                                 )
                         }
                     }
-                    .padding(.horizontal, AppSpacing.xl)
-                    .padding(.vertical, AppSpacing.lg)
+                    .padding(.horizontal, 28)
+                    .padding(.vertical, 24)
                 }
             }
-            .frame(width: 560, height: 620)
+            .frame(width: 560, height: 608)
             .background(AppColors.popover)
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
             .shadow(color: AppElevation.modalShadow, radius: 20, x: 0, y: 8)

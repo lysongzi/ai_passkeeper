@@ -27,7 +27,7 @@ struct PKFormRowRightLabel<Field: View>: View {
     var body: some View {
         HStack(alignment: verticalAlignment, spacing: spacing) {
             Text(label)
-                .font(.subheadline)
+                .font(.system(size: 13, weight: .medium))
                 .foregroundColor(AppColors.mutedForeground)
                 .lineLimit(1)
                 .truncationMode(.tail)
@@ -52,7 +52,7 @@ struct PKFieldContainer<Content: View>: View {
     var body: some View {
         content
             .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .leading)
-            .padding(.horizontal, AppSpacing.md)
+            .padding(.horizontal, 14)
             .background(AppColors.inputBackground)
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
             .overlay(
@@ -73,7 +73,7 @@ struct PKMetadataPanel<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+        VStack(alignment: .leading, spacing: 10) {
             if let title = title {
                 Text(title)
                     .font(.subheadline)
@@ -81,11 +81,11 @@ struct PKMetadataPanel<Content: View>: View {
                     .foregroundColor(AppColors.mutedForeground)
             }
 
-            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+            VStack(alignment: .leading, spacing: 6) {
                 content
             }
         }
-        .padding(AppSpacing.lg)
+        .padding(18)
         .background(AppColors.card)
         .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusLg))
         .overlay(

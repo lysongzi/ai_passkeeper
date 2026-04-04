@@ -36,7 +36,7 @@ struct SettingsViewNew: View {
                                     Image(systemName: "chevron.left")
                                     Text("settings.back".localized)
                                 }
-                                .font(.subheadline.weight(.medium))
+                                .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(AppColors.mutedForeground)
                             }
                             .buttonStyle(.plain)
@@ -56,7 +56,7 @@ struct SettingsViewNew: View {
                             .font(.headline)
                             .foregroundColor(AppColors.primaryForeground)
                             .padding(.horizontal, AppSpacing.lg)
-                            .frame(height: 36)
+                            .frame(height: 34)
                             .background(isResetValid ? AppColors.primary : AppColors.muted)
                             .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
                             .disabled(!isResetValid || isResetting)
@@ -77,7 +77,7 @@ struct SettingsViewNew: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(width: 560, height: 560)
+            .frame(width: 560, height: 548)
             .background(AppColors.popover)
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusXl))
             .shadow(color: AppElevation.modalShadow, radius: 20, x: 0, y: 8)
@@ -86,7 +86,7 @@ struct SettingsViewNew: View {
 
     private var settingsContent: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: AppSpacing.xl) {
+            VStack(alignment: .leading, spacing: 24) {
                 settingsSection(
                     title: "settings.general".localized,
                     rows: {
@@ -123,8 +123,8 @@ struct SettingsViewNew: View {
                                 route = .resetPassword
                             }
                         } label: {
-                            HStack(spacing: AppSpacing.md) {
-                                VStack(alignment: .leading, spacing: 2) {
+                            HStack(spacing: 14) {
+                                VStack(alignment: .leading, spacing: 3) {
                                     Text("settings.resetPassword".localized)
                                         .font(.subheadline)
                                         .foregroundColor(AppColors.foreground)
@@ -139,7 +139,7 @@ struct SettingsViewNew: View {
                                     .font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(AppColors.mutedForeground)
                             }
-                            .padding(.horizontal, AppSpacing.md)
+                            .padding(.horizontal, 14)
                             .frame(minHeight: AppConstants.inputHeight)
                             .background(AppColors.inputBackground)
                             .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
@@ -152,14 +152,14 @@ struct SettingsViewNew: View {
                     }
                 )
             }
-            .padding(.horizontal, AppSpacing.xl)
-            .padding(.vertical, AppSpacing.lg)
+            .padding(.horizontal, 28)
+            .padding(.vertical, 24)
         }
     }
 
     private var resetPasswordContent: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: AppSpacing.xl) {
+            VStack(alignment: .leading, spacing: 24) {
                 if let feedback = feedbackMessage {
                     feedbackBanner(message: feedback.message, color: feedback.color)
                 }
@@ -187,19 +187,19 @@ struct SettingsViewNew: View {
                     }
                 )
             }
-            .padding(.horizontal, AppSpacing.xl)
-            .padding(.vertical, AppSpacing.lg)
+            .padding(.horizontal, 28)
+            .padding(.vertical, 24)
         }
     }
 
     private func settingsSection<Rows: View>(title: String, @ViewBuilder rows: () -> Rows) -> some View {
-        VStack(alignment: .leading, spacing: AppSpacing.md) {
+        VStack(alignment: .leading, spacing: 14) {
             Text(title)
-                .font(.subheadline.weight(.medium))
+                .font(.system(size: 13, weight: .medium))
                 .foregroundColor(AppColors.mutedForeground)
 
             PKMetadataPanel {
-                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                VStack(alignment: .leading, spacing: 14) {
                     rows()
                 }
             }
@@ -215,7 +215,7 @@ struct SettingsViewNew: View {
         }
         .labelsHidden()
         .pickerStyle(.menu)
-        .frame(width: 180, alignment: .trailing)
+        .frame(width: 188, alignment: .trailing)
     }
 
     private func resetPasswordField(label: String, text: Binding<String>, icon: String) -> some View {
@@ -238,8 +238,8 @@ struct SettingsViewNew: View {
             .font(.subheadline)
             .foregroundColor(color)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, AppSpacing.md)
-            .padding(.vertical, AppSpacing.sm)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
             .background(color.opacity(0.12))
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
             .overlay(

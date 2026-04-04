@@ -32,7 +32,7 @@ struct PasswordDetailViewNew: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: AppSpacing.xl) {
+            VStack(alignment: .leading, spacing: 26) {
                 headerSection
 
                 detailFieldSection(
@@ -102,7 +102,7 @@ struct PasswordDetailViewNew: View {
                                 }
                             } label: {
                                 PKFieldContainer {
-                                    HStack {
+                                    HStack(alignment: .firstTextBaseline) {
                                         Text(editedCategory)
                                             .foregroundColor(AppColors.foreground)
                                         Spacer()
@@ -164,7 +164,9 @@ struct PasswordDetailViewNew: View {
                     deleteButton
                 }
             }
-            .padding(AppSpacing.xl)
+            .padding(.horizontal, 28)
+            .padding(.top, 24)
+            .padding(.bottom, 28)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColors.background)
@@ -192,18 +194,18 @@ struct PasswordDetailViewNew: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 68, height: 68)
+                    .frame(width: 64, height: 64)
 
-                GradientIcon(systemName: "key.fill", size: 30)
+                GradientIcon(systemName: "key.fill", size: 28)
             }
 
             Group {
                 if isEditing {
                     editableTitleField
                 } else {
-                    VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    VStack(alignment: .leading, spacing: 6) {
                         Text(item.title)
-                            .font(.system(size: 28, weight: .bold))
+                            .font(.system(size: 30, weight: .bold))
                             .foregroundColor(AppColors.foreground)
 
                         Text(localizedCategory)
@@ -253,16 +255,16 @@ struct PasswordDetailViewNew: View {
                 .buttonStyle(SecondaryButtonStyle())
             }
         }
-        .frame(maxWidth: 220)
+        .frame(maxWidth: 232)
     }
 
     // MARK: - Shared Section Builders
 
     @ViewBuilder
     private func detailFieldSection<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+        VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .font(.subheadline.weight(.medium))
+                .font(.system(size: 13, weight: .medium))
                 .foregroundColor(AppColors.mutedForeground)
 
             content()
@@ -280,14 +282,14 @@ struct PasswordDetailViewNew: View {
 
     @ViewBuilder
     private func metadataRow(title: String, value: String) -> some View {
-        HStack {
+        HStack(alignment: .firstTextBaseline) {
             Text(title)
                 .foregroundColor(AppColors.mutedForeground)
             Spacer()
             Text(value)
                 .foregroundColor(AppColors.foreground)
         }
-        .font(.caption)
+        .font(.system(size: 12, weight: .medium))
     }
 
     // MARK: - Delete Button
