@@ -43,14 +43,14 @@
 "detail.delete" = "Delete";
 "detail.deleteConfirm" = "Are you sure you want to delete";
 "detail.deleteWarning" = "This action cannot be undone.";
-"detail.username" = "Username";
+"detail.username" = "Account Name";
 "detail.copied" = "Copied!";
 "detail.edit" = "Edit";
 
 /* Add/Edit Password */
 "addEdit.title" = "Details";
-"addEdit.titleField" = "Title";
-"addEdit.username" = "Username / Email";
+"addEdit.titleField" = "Account Title";
+"addEdit.username" = "Account Name";
 "addEdit.category" = "Category";
 "addEdit.cancel" = "Cancel";
 "addEdit.save" = "Save";
@@ -91,6 +91,14 @@
 
 /* Add/Edit */
 "addEdit.details" = "Details";
+"addEdit.placeholder.title" = "Enter account title";
+"addEdit.placeholder.username" = "Enter account name";
+"addEdit.placeholder.password" = "Enter password";
+
+/* Settings */
 "settings.back" = "Back";
 "settings.resetPasswordDesc" = "Change your primary password used to unlock the vault.";
 "settings.resetSuccess" = "Password updated successfully.";
+"settings.placeholder.currentPassword" = "Enter current password";
+"settings.placeholder.newPassword" = "Enter new password";
+"settings.placeholder.confirmPassword" = "Enter new password again";

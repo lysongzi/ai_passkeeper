@@ -25,8 +25,8 @@
 "auth.unlock" = "解锁";
 "auth.enterPassword" = "输入主密码以解锁";
 "auth.welcome" = "欢迎使用密码管家";
-"auth.createVault" = "创建保险库";
-"auth.createVaultDesc" = "创建一个主密码来保护您的保险库";
+"auth.createVault" = "创建密码库";
+"auth.createVaultDesc" = "创建一个主密码来保护您的密码库";
 "auth.passwordMinLength" = "密码至少需要8个字符";
 "auth.password" = "主密码";
 "auth.confirmPassword" = "确认密码";
@@ -43,14 +43,14 @@
 "detail.delete" = "删除";
 "detail.deleteConfirm" = "确定要删除";
 "detail.deleteWarning" = "此操作无法撤销";
-"detail.username" = "用户名";
+"detail.username" = "帐号名称";
 "detail.copied" = "已复制！";
 "detail.edit" = "编辑";
 
 /* Add/Edit Password */
 "addEdit.title" = "密码详情";
-"addEdit.titleField" = "标题";
-"addEdit.username" = "用户名 / 邮箱";
+"addEdit.titleField" = "帐号标题";
+"addEdit.username" = "帐号名称";
 "addEdit.category" = "分类";
 "addEdit.cancel" = "取消";
 "addEdit.save" = "保存";
@@ -79,7 +79,7 @@
 
 /* Menu */
 "menu.newPassword" = "新建密码";
-"menu.lockVault" = "锁定保险库";
+"menu.lockVault" = "锁定密码库";
 
 /* Common */
 "common.cancel" = "取消";
@@ -91,6 +91,14 @@
 
 /* Add/Edit */
 "addEdit.details" = "详情";
+"addEdit.placeholder.title" = "请输入帐号标题";
+"addEdit.placeholder.username" = "请输入帐号名称";
+"addEdit.placeholder.password" = "请输入密码";
+
+/* Settings */
 "settings.back" = "返回";
 "settings.resetPasswordDesc" = "修改用于解锁密码库的主密码。";
 "settings.resetSuccess" = "密码已成功更新。";
+"settings.placeholder.currentPassword" = "请输入当前密码";
+"settings.placeholder.newPassword" = "请输入新密码";
+"settings.placeholder.confirmPassword" = "请再次输入新密码";

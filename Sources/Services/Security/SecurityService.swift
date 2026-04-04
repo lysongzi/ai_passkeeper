@@ -40,10 +40,11 @@ final class SecurityService {
 
     /// Verify primary password
     func verifyPrimaryPassword(_ password: String) throws -> Bool {
-        guard let storedHash = keychainService.getPrimaryPasswordHash(),
-              let salt = keychainService.getSalt() else {
+        guard let credentials = keychainService.getCredentials() else {
             return false
         }
+        let storedHash = credentials.hash
+        let salt = credentials.salt
 
         // Derive key from input password
         let derivedKey = try deriveKey(from: password, salt: salt)

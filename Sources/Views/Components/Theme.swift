@@ -289,6 +289,27 @@ struct SecondaryButtonStyle: ButtonStyle {
     }
 }
 
+/// Detail action button style — same dimensions as SecondaryButtonStyle,
+/// updated background (accent), corner radius (radiusMd), and subtle border.
+struct DetailActionButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.headline)
+            .foregroundColor(AppColors.foreground)
+            .frame(height: AppConstants.buttonHeight)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 16)
+            .background(AppColors.accent)
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+            .overlay(
+                RoundedRectangle(cornerRadius: AppConstants.radiusMd)
+                    .stroke(AppColors.border.opacity(0.7), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
+            .opacity(configuration.isPressed ? 0.9 : 1.0)
+    }
+}
+
 /// Destructive button style
 struct DestructiveButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {

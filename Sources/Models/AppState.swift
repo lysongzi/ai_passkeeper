@@ -19,7 +19,7 @@ final class AppState: ObservableObject {
     }
 
     private func checkFirstLaunch() {
-        let hasPassword = keychainService.hasStoredPasswordHash()
+        let hasPassword = keychainService.isVaultSetup
         isFirstLaunch = !hasPassword
         isSetupComplete = hasPassword
     }

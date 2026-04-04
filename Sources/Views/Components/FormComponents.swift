@@ -62,6 +62,129 @@ struct PKFieldContainer<Content: View>: View {
     }
 }
 
+/// Full-width picker with styled input appearance (background + border + rounded corners).
+/// Uses a custom Button + popover so the dropdown width matches the button width.
+/// Set `showIcons: false` for plain text options (e.g. language, appearance settings).
+struct PKCategoryPicker: View {
+    let categories: [String]
+    @Binding var selection: String
+    var showIcons: Bool = true
+
+    @State private var isExpanded = false
+    @State private var buttonWidth: CGFloat = 0
+
+    var body: some View {
+        Button {
+            isExpanded.toggle()
+        } label: {
+            HStack(spacing: AppSpacing.sm) {
+                if showIcons {
+                    Image(systemName: categoryIcon(for: selection))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(AppColors.sidebarPrimary)
+                }
+
+                Text(selection)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(AppColors.foreground)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(AppColors.mutedForeground)
+            }
+            .padding(.horizontal, 14)
+            .frame(maxWidth: .infinity, minHeight: AppConstants.inputHeight, alignment: .leading)
+            .background(AppColors.inputBackground)
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+            .overlay(
+                RoundedRectangle(cornerRadius: AppConstants.radiusMd)
+                    .stroke(AppColors.border, lineWidth: 1)
+            )
+            .background(
+                GeometryReader { geo in
+                    Color.clear.preference(key: PKPickerWidthKey.self, value: geo.size.width)
+                }
+            )
+        }
+        .buttonStyle(.plain)
+        .onPreferenceChange(PKPickerWidthKey.self) { buttonWidth = $0 }
+        .popover(isPresented: $isExpanded, arrowEdge: .bottom) {
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(categories, id: \.self) { category in
+                    Button {
+                        selection = category
+                        isExpanded = false
+                    } label: {
+                        HStack(spacing: AppSpacing.sm) {
+                            if showIcons {
+                                Image(systemName: categoryIcon(for: category))
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(category == selection ? AppColors.sidebarPrimary : AppColors.mutedForeground)
+                                    .frame(width: 18)
+                            }
+
+                            Text(category)
+                                .font(.system(size: 14, weight: category == selection ? .semibold : .medium))
+                                .foregroundColor(AppColors.foreground)
+
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.horizontal, 12)
+                        .frame(maxWidth: .infinity, minHeight: 36, alignment: .leading)
+                        .background(category == selection ? AppColors.sidebarAccent : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusSm))
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 6)
+                }
+            }
+            .padding(.vertical, 6)
+            .frame(minWidth: buttonWidth)
+        }
+    }
+}
+
+private struct PKPickerWidthKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
+/// Primary action button for modal headers (Save / Reset / Confirm).
+/// Active: `AppColors.primary` background. Inactive: subtle white-tinted surface visible in both themes.
+struct PKModalActionButton: View {
+    let title: String
+    let isEnabled: Bool
+    var isLoading: Bool = false
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Group {
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: AppColors.primaryForeground))
+                        .scaleEffect(0.8)
+                } else {
+                    Text(title)
+                }
+            }
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundColor(isEnabled ? AppColors.primaryForeground : AppColors.mutedForeground)
+            .padding(.horizontal, 16)
+            .frame(height: 34)
+            .background(isEnabled ? AppColors.primary : Color.primary.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .opacity(isLoading ? 0.86 : 1)
+        .disabled(!isEnabled || isLoading)
+    }
+}
+
 /// Metadata panel that groups key/value style info in a bordered card.
 struct PKMetadataPanel<Content: View>: View {
     let title: String?

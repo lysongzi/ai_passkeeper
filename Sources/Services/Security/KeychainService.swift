@@ -6,38 +6,46 @@ import LocalAuthentication
 final class KeychainService {
 
     private let serviceName = "com.passkeeper.macos"
-    private let primaryPasswordKey = "primaryPasswordHash"
-    private let saltKey = "passwordSalt"
+    private let credentialBundleKey = "credentialBundle"
     private let dataEncryptionKeyTag = "dataEncryptionKey"
     private let sessionKeyTag = "sessionKey"
 
-    // MARK: - Primary Password
+    // MARK: - Setup Flag (non-sensitive, stored in UserDefaults)
 
-    /// Check if primary password hash is stored
-    func hasStoredPasswordHash() -> Bool {
-        return getData(forKey: primaryPasswordKey) != nil
+    private static let vaultSetupKey = "vaultIsSetup"
+
+    var isVaultSetup: Bool {
+        get { UserDefaults.standard.bool(forKey: Self.vaultSetupKey) }
+        set { UserDefaults.standard.set(newValue, forKey: Self.vaultSetupKey) }
     }
 
-    /// Store primary password hash
+    // MARK: - Primary Password (hash + salt bundled as one keychain item)
+
+    /// Store primary password hash and salt as a single keychain item
     func storePrimaryPasswordHash(_ hash: Data, salt: Data) throws {
-        try storeData(hash, forKey: primaryPasswordKey)
-        try storeData(salt, forKey: saltKey)
+        var bundle = Data()
+        var hashLength = UInt32(hash.count).bigEndian
+        bundle.append(Data(bytes: &hashLength, count: 4))
+        bundle.append(hash)
+        bundle.append(salt)
+        try storeData(bundle, forKey: credentialBundleKey)
+        isVaultSetup = true
     }
 
-    /// Get stored primary password hash
-    func getPrimaryPasswordHash() -> Data? {
-        return getData(forKey: primaryPasswordKey)
-    }
-
-    /// Get stored salt
-    func getSalt() -> Data? {
-        return getData(forKey: saltKey)
+    /// Get stored primary password hash and salt in one keychain read
+    func getCredentials() -> (hash: Data, salt: Data)? {
+        guard let bundle = getData(forKey: credentialBundleKey), bundle.count > 4 else { return nil }
+        let hashLength = Int(UInt32(bigEndian: bundle[0..<4].withUnsafeBytes { $0.load(as: UInt32.self) }))
+        guard bundle.count >= 4 + hashLength else { return nil }
+        let hash = bundle[4..<(4 + hashLength)]
+        let salt = bundle[(4 + hashLength)...]
+        return (Data(hash), Data(salt))
     }
 
     /// Delete primary password hash and salt
     func deletePrimaryPasswordHash() throws {
-        try deleteItem(forKey: primaryPasswordKey)
-        try deleteItem(forKey: saltKey)
+        try deleteItem(forKey: credentialBundleKey)
+        isVaultSetup = false
     }
 
     // MARK: - Data Encryption Key

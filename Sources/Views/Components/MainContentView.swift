@@ -33,10 +33,8 @@ struct MainContentView: View {
                                 selectedPasswordId = nil
                             }
                         },
-                        onSave: {
-                            Task {
-                                await viewModel.loadPasswords()
-                            }
+                        onSave: { updatedItem in
+                            await viewModel.updatePassword(updatedItem)
                         }
                     )
                 } else {
