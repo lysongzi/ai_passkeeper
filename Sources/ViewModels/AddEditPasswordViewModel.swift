@@ -9,12 +9,13 @@ final class AddEditPasswordViewModel: ObservableObject {
     @Published var username: String = ""
     @Published var password: String = ""
     @Published var category: String = PasswordCategory.general.localizedName
+    @Published var phoneNumber: String = ""
+    @Published var email: String = ""
     @Published var notes: String = ""
     @Published var showPassword: Bool = false
     @Published var isSaving: Bool = false
     @Published var errorMessage: String?
-
-    let categories = PasswordCategory.allCases.map { $0.localizedName }
+    @Published var customCategories: [CustomCategory] = []
 
     private let repository = PasswordRepository()
     private var editingItemId: UUID?
@@ -26,7 +27,20 @@ final class AddEditPasswordViewModel: ObservableObject {
     var isValid: Bool {
         !title.trimmingCharacters(in: .whitespaces).isEmpty &&
         !username.trimmingCharacters(in: .whitespaces).isEmpty &&
-        !password.isEmpty
+        !password.isEmpty &&
+        !category.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
+    var categories: [String] {
+        PasswordCategory.allCases.map { $0.localizedName } + customCategories.map(\.name)
+    }
+
+    func loadCustomCategories() {
+        do {
+            customCategories = try repository.fetchCustomCategories()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     // MARK: - Load Data
@@ -36,7 +50,8 @@ final class AddEditPasswordViewModel: ObservableObject {
         title = item.title
         username = item.username
         password = item.password
-        // Convert English category to localized for display
+        phoneNumber = item.phoneNumber
+        email = item.email
         if let cat = PasswordCategory.allCases.first(where: { $0.rawValue == item.category }) {
             category = cat.localizedName
         } else if item.category == "All" {
@@ -51,9 +66,10 @@ final class AddEditPasswordViewModel: ObservableObject {
         editingItemId = nil
         title = ""
         username = ""
-        category = PasswordCategory.general.localizedName
         password = ""
-        category = "General"
+        category = PasswordCategory.general.localizedName
+        phoneNumber = ""
+        email = ""
         notes = ""
         showPassword = false
         errorMessage = nil
@@ -70,18 +86,10 @@ final class AddEditPasswordViewModel: ObservableObject {
     ) {
         var characters = ""
 
-        if includeUppercase {
-            characters += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        }
-        if includeLowercase {
-            characters += "abcdefghijklmnopqrstuvwxyz"
-        }
-        if includeNumbers {
-            characters += "0123456789"
-        }
-        if includeSymbols {
-            characters += "!@#$%^&*()_+-=[]{}|;:,.<>?"
-        }
+        if includeUppercase { characters += "ABCDEFGHIJKLMNOPQRSTUVWXYZ" }
+        if includeLowercase { characters += "abcdefghijklmnopqrstuvwxyz" }
+        if includeNumbers { characters += "0123456789" }
+        if includeSymbols { characters += "!@#$%^&*()_+-=[]{}|;:,.<>?" }
 
         guard !characters.isEmpty else {
             errorMessage = "Please select at least one character type"
@@ -106,7 +114,12 @@ final class AddEditPasswordViewModel: ObservableObject {
 
     func save() async -> Bool {
         guard isValid else {
-            errorMessage = "Please fill in all required fields"
+            errorMessage = "validation.requiredFields".localized
+            return false
+        }
+
+        if let fieldError = validateOptionalFields() {
+            errorMessage = fieldError
             return false
         }
 
@@ -114,26 +127,27 @@ final class AddEditPasswordViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            // Convert localized category back to English for storage
             let categoryKey = PasswordCategory.allCases.first { $0.localizedName == category }?.rawValue ?? category
 
             if let itemId = editingItemId {
-                // Update existing
                 try await repository.updateItem(
                     id: itemId,
                     title: title.trimmingCharacters(in: .whitespaces),
                     username: username.trimmingCharacters(in: .whitespaces),
                     password: password,
                     category: categoryKey,
+                    phoneNumber: phoneNumber,
+                    email: email,
                     notes: notes
                 )
             } else {
-                // Add new
                 _ = try await repository.addItem(
                     title: title.trimmingCharacters(in: .whitespaces),
                     username: username.trimmingCharacters(in: .whitespaces),
                     password: password,
                     category: categoryKey,
+                    phoneNumber: phoneNumber,
+                    email: email,
                     notes: notes
                 )
             }
@@ -145,5 +159,15 @@ final class AddEditPasswordViewModel: ObservableObject {
             isSaving = false
             return false
         }
+    }
+
+    private func validateOptionalFields() -> String? {
+        if !AccountFieldValidator.isValidPhoneNumber(phoneNumber) {
+            return "validation.phone.invalid".localized
+        }
+        if !AccountFieldValidator.isValidEmail(email) {
+            return "validation.email.invalid".localized
+        }
+        return nil
     }
 }

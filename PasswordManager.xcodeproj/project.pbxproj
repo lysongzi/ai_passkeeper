@@ -42,6 +42,11 @@
 		DB11547BDE9B71905AD296F1 /* SecurityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67F022A33075986590301572 /* SecurityService.swift */; };
 		DF1D59BB3D72033C312C6D4E /* CommonComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09242D7336DA0D07E26215C9 /* CommonComponents.swift */; };
 		FBCA490D14501D8DD6DBB6DB /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 633A0A9A36A5BC5F5A170E3F /* SQLite */; };
+
+		0F1000010000000000000001 /* CustomCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F2000010000000000000001 /* CustomCategory.swift */; };
+		0F1000020000000000000002 /* AccountFieldValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F2000020000000000000002 /* AccountFieldValidator.swift */; };
+		0F1000030000000000000003 /* AccountFieldValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F2000030000000000000003 /* AccountFieldValidatorTests.swift */; };
+		0F1000040000000000000004 /* CustomCategoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F2000040000000000000004 /* CustomCategoryStoreTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,6 +99,11 @@
 		F979AC5E6891A0767AACA31B /* SecureClipboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureClipboardManager.swift; sourceTree = "<group>"; };
 		FA1DFEA22DC7CCB82D7A766C /* PasswordItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordItem.swift; sourceTree = "<group>"; };
 		FB62C16782E5F16E2CE87208 /* UnlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockView.swift; sourceTree = "<group>"; };
+
+		0F2000010000000000000001 /* CustomCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCategory.swift; sourceTree = "<group>"; };
+		0F2000020000000000000002 /* AccountFieldValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountFieldValidator.swift; sourceTree = "<group>"; };
+		0F2000030000000000000003 /* AccountFieldValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountFieldValidatorTests.swift; sourceTree = "<group>"; };
+		0F2000040000000000000004 /* CustomCategoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCategoryStoreTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +145,8 @@
 				596BD74A642A0347009E81D4 /* PassKeeperTests.swift */,
 				C00C24B311AE61EB030230D5 /* SecurityServiceTests.swift */,
 				BB01234500000000DEADBEEF /* PasswordUpdateTests.swift */,
+				0F2000030000000000000003 /* AccountFieldValidatorTests.swift */,
+				0F2000040000000000000004 /* CustomCategoryStoreTests.swift */,
 			);
 			path = SourcesTests;
 			sourceTree = "<group>";
@@ -169,6 +181,14 @@
 				D7BC5E8FC52D39D020C0E5F2 /* PasswordRepository.swift */,
 			);
 			path = Storage;
+			sourceTree = "<group>";
+		};
+		6CC37252B984CFFB38B77E45 /* Validation */ = {
+			isa = PBXGroup;
+			children = (
+				0F2000020000000000000002 /* AccountFieldValidator.swift */,
+			);
+			path = Validation;
 			sourceTree = "<group>";
 		};
 		743D34FE64FF476F1B03B55B /* ViewModels */ = {
@@ -235,6 +255,7 @@
 				845A20E7062F7107EFFC8C1B /* I18nService.swift */,
 				83D841F2936812A9F1258544 /* Security */,
 				6CC37252B984CFFB38B77E44 /* Storage */,
+				6CC37252B984CFFB38B77E45 /* Validation */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -243,6 +264,7 @@
 			isa = PBXGroup;
 			children = (
 				E38900A0D19C38AEAD3280B6 /* AppState.swift */,
+				0F2000010000000000000001 /* CustomCategory.swift */,
 				FA1DFEA22DC7CCB82D7A766C /* PasswordItem.swift */,
 			);
 			path = Models;
@@ -358,6 +380,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6591F2E46E491422362197C4 /* AddEditPasswordView.swift in Sources */,
+				0F1000020000000000000002 /* AccountFieldValidator.swift in Sources */,
 				A6FE830449C05D897FCA0E90 /* AddEditPasswordViewModel.swift in Sources */,
 				848AEEE90EDB8E2A9607C0BA /* AppState.swift in Sources */,
 				114CAA1F5FFD733DE121BF7B /* AuthenticationViewModel.swift in Sources */,
@@ -373,6 +396,7 @@
 				572E114879102D082DFA0D4A /* ModalComponents.swift in Sources */,
 				8044751185D4A49AF3DE835F /* PassKeeperApp.swift in Sources */,
 				CC9768E020044361BABC0733 /* PasswordDetailView.swift in Sources */,
+				0F1000010000000000000001 /* CustomCategory.swift in Sources */,
 				B98ED59027F45B46B1FF96C9 /* PasswordItem.swift in Sources */,
 				3721CF88B22855AEEC48DD05 /* PasswordListViewModel.swift in Sources */,
 				69DD9E9C9206466A43E2909B /* PasswordRepository.swift in Sources */,
@@ -393,6 +417,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0F1000030000000000000003 /* AccountFieldValidatorTests.swift in Sources */,
+				0F1000040000000000000004 /* CustomCategoryStoreTests.swift in Sources */,
 				7405E2581A219A9B5F01E40D /* PassKeeperTests.swift in Sources */,
 				22196189FC1EFBA785DC9763 /* SecurityServiceTests.swift in Sources */,
 				AA01234500000000DEADBEEF /* PasswordUpdateTests.swift in Sources */,

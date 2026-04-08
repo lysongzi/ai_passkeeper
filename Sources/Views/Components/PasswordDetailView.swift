@@ -16,12 +16,20 @@ struct PasswordDetailViewNew: View {
     @State private var editedTitle: String = ""
     @State private var editedUsername: String = ""
     @State private var editedPassword: String = ""
-    @State private var editedNotes: String = ""
     @State private var editedCategory: String = ""
+    @State private var editedPhoneNumber: String = ""
+    @State private var editedEmail: String = ""
+    @State private var editedNotes: String = ""
     @State private var showEditedPassword = false
     @State private var isSaving = false
+    @State private var customCategories: [CustomCategory] = []
+    @State private var validationMessage: String?
 
-    private let categories = PasswordCategory.allCases.map { $0.localizedName }
+    private let repository = PasswordRepository()
+
+    private var categories: [String] {
+        PasswordCategory.allCases.map { $0.localizedName } + customCategories.map(\.name)
+    }
 
     private var localizedCategory: String {
         if let cat = PasswordCategory.allCases.first(where: { $0.rawValue == item.category }) {
@@ -35,114 +43,143 @@ struct PasswordDetailViewNew: View {
             VStack(alignment: .leading, spacing: 28) {
                 headerSection
 
+                if let validationMessage, !validationMessage.isEmpty {
+                    Text(validationMessage)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(AppColors.destructive)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(AppColors.destructive.opacity(0.12))
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+                }
+
                 VStack(alignment: .leading, spacing: 20) {
-                    detailFieldSection(
-                        title: "detail.username".localized,
-                        content: {
-                            if isEditing {
-                                editableTextField(text: $editedUsername, placeholder: "addEdit.username".localized)
-                            } else {
-                                PKFieldContainer {
-                                    HStack(spacing: AppSpacing.sm) {
-                                        Text(item.username)
-                                            .font(.system(size: 14, weight: .medium))
-                                            .textSelection(.enabled)
-                                            .foregroundColor(AppColors.foreground)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                                        CopyButton(text: item.username)
-                                    }
-                                }
-                            }
-                        }
-                    )
-
-                    detailFieldSection(
-                        title: "detail.password".localized,
-                        content: {
-                            if isEditing {
+                    detailFieldSection(title: "detail.username".localized, requirementKey: "field.required".localized) {
+                        if isEditing {
+                            editableTextField(text: $editedUsername, placeholder: "addEdit.username".localized)
+                        } else {
+                            PKFieldContainer {
                                 HStack(spacing: AppSpacing.sm) {
-                                    PKFieldContainer {
-                                        Group {
-                                            if showEditedPassword {
-                                                TextField("detail.password".localized, text: $editedPassword)
-                                            } else {
-                                                SecureField("detail.password".localized, text: $editedPassword)
-                                            }
-                                        }
-                                        .textFieldStyle(.plain)
+                                    Text(item.username)
                                         .font(.system(size: 14, weight: .medium))
-                                    }
-
-                                    TogglePasswordButton(isSecure: $showEditedPassword)
-                                }
-                            } else {
-                                HStack(spacing: AppSpacing.sm) {
-                                    PKFieldContainer {
-                                        Text(showPassword ? item.password : String(repeating: "•", count: min(item.password.count, 20)))
-                                            .font(.system(size: 14, weight: .medium, design: .monospaced))
-                                            .foregroundColor(AppColors.foreground)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                    }
-
-                                    TogglePasswordButton(isSecure: $showPassword)
-                                    CopyButton(text: item.password)
+                                        .textSelection(.enabled)
+                                        .foregroundColor(AppColors.foreground)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    CopyButton(text: item.username)
                                 }
                             }
                         }
-                    )
+                    }
 
-                    detailFieldSection(
-                        title: "addEdit.category".localized,
-                        content: {
+                    detailFieldSection(title: "detail.password".localized, requirementKey: "field.required".localized) {
+                        if isEditing {
+                            HStack(spacing: AppSpacing.sm) {
+                                PKFieldContainer {
+                                    Group {
+                                        if showEditedPassword {
+                                            TextField("detail.password".localized, text: $editedPassword)
+                                        } else {
+                                            SecureField("detail.password".localized, text: $editedPassword)
+                                        }
+                                    }
+                                    .textFieldStyle(.plain)
+                                    .font(.system(size: 14, weight: .medium))
+                                }
+                                TogglePasswordButton(isSecure: $showEditedPassword)
+                            }
+                        } else {
+                            HStack(spacing: AppSpacing.sm) {
+                                PKFieldContainer {
+                                    Text(showPassword ? item.password : String(repeating: "•", count: min(item.password.count, 20)))
+                                        .font(.system(size: 14, weight: .medium, design: .monospaced))
+                                        .foregroundColor(AppColors.foreground)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                TogglePasswordButton(isSecure: $showPassword)
+                                CopyButton(text: item.password)
+                            }
+                        }
+                    }
+
+                    detailFieldSection(title: "addEdit.category".localized, requirementKey: "field.required".localized) {
+                        if isEditing {
+                            PKCategoryPicker(categories: categories, selection: $editedCategory)
+                        } else {
+                            PKFieldContainer {
+                                HStack(spacing: AppSpacing.sm) {
+                                    Image(systemName: categoryIcon(for: item.category))
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(AppColors.sidebarPrimary)
+                                    Text(localizedCategory)
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(AppColors.foreground)
+                                    Spacer()
+                                }
+                            }
+                        }
+                    }
+
+                    if isEditing || !item.phoneNumber.isEmpty {
+                        detailFieldSection(title: "detail.phone".localized, requirementKey: "field.optional".localized) {
                             if isEditing {
-                                PKCategoryPicker(
-                                    categories: categories,
-                                    selection: $editedCategory
-                                )
+                                editableTextField(text: $editedPhoneNumber, placeholder: "addEdit.placeholder.phone".localized)
                             } else {
                                 PKFieldContainer {
                                     HStack(spacing: AppSpacing.sm) {
-                                        Image(systemName: categoryIcon(for: item.category))
-                                            .font(.system(size: 14, weight: .semibold))
-                                            .foregroundColor(AppColors.sidebarPrimary)
-                                        Text(localizedCategory)
+                                        Text(item.phoneNumber)
                                             .font(.system(size: 14, weight: .medium))
                                             .foregroundColor(AppColors.foreground)
-                                        Spacer()
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        CopyButton(text: item.phoneNumber)
                                     }
                                 }
                             }
                         }
-                    )
+                    }
+
+                    if isEditing || !item.email.isEmpty {
+                        detailFieldSection(title: "detail.email".localized, requirementKey: "field.optional".localized) {
+                            if isEditing {
+                                editableTextField(text: $editedEmail, placeholder: "addEdit.placeholder.email".localized)
+                            } else {
+                                PKFieldContainer {
+                                    HStack(spacing: AppSpacing.sm) {
+                                        Text(item.email)
+                                            .font(.system(size: 14, weight: .medium))
+                                            .foregroundColor(AppColors.foreground)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        CopyButton(text: item.email)
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     if isEditing || !item.notes.isEmpty {
-                        detailFieldSection(
-                            title: "detail.notes".localized,
-                            content: {
-                                if isEditing {
-                                    TextEditor(text: $editedNotes)
+                        detailFieldSection(title: "detail.notes".localized, requirementKey: "field.optional".localized) {
+                            if isEditing {
+                                TextEditor(text: $editedNotes)
+                                    .font(.system(size: 14, weight: .regular))
+                                    .frame(minHeight: 66)
+                                    .scrollContentBackground(.hidden)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 10)
+                                    .background(AppColors.inputBackground)
+                                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: AppConstants.radiusMd)
+                                            .stroke(AppColors.border, lineWidth: 1)
+                                    )
+                            } else {
+                                PKFieldContainer(minHeight: 66) {
+                                    Text(item.notes)
                                         .font(.system(size: 14, weight: .regular))
-                                        .frame(minHeight: 66)
-                                        .scrollContentBackground(.hidden)
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 10)
-                                        .background(AppColors.inputBackground)
-                                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.radiusMd))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: AppConstants.radiusMd)
-                                                .stroke(AppColors.border, lineWidth: 1)
-                                        )
-                                } else {
-                                    PKFieldContainer(minHeight: 66) {
-                                        Text(item.notes)
-                                            .font(.system(size: 14, weight: .regular))
-                                            .foregroundColor(AppColors.foreground)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                    }
+                                        .foregroundColor(AppColors.foreground)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
                                 }
                             }
-                        )
+                        }
                     }
                 }
 
@@ -164,17 +201,14 @@ struct PasswordDetailViewNew: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColors.background)
+        .task { loadCustomCategories() }
         .alert("detail.deletePassword".localized + "?", isPresented: $showingDeleteConfirmation) {
             Button("detail.cancel".localized, role: .cancel) { }
-            Button("detail.delete".localized, role: .destructive) {
-                onDelete()
-            }
+            Button("detail.delete".localized, role: .destructive) { onDelete() }
         } message: {
             Text("detail.deleteConfirm".localized + " \"\(item.title)\"? " + "detail.deleteWarning".localized)
         }
     }
-
-    // MARK: - Header Section
 
     @ViewBuilder
     private var headerSection: some View {
@@ -189,7 +223,6 @@ struct PasswordDetailViewNew: View {
                         )
                     )
                     .frame(width: 60, height: 60)
-
                 GradientIcon(systemName: "key.fill", size: 26)
             }
 
@@ -223,16 +256,12 @@ struct PasswordDetailViewNew: View {
     private var headerButtons: some View {
         HStack(spacing: AppSpacing.sm) {
             if isEditing {
-                Button("detail.cancel".localized) {
-                    cancelEditing()
-                }
-                .buttonStyle(DetailActionButtonStyle())
+                Button("detail.cancel".localized) { cancelEditing() }
+                    .buttonStyle(DetailActionButtonStyle())
 
-                Button("addEdit.save".localized) {
-                    saveChanges()
-                }
-                .buttonStyle(PrimaryButtonStyle())
-                .disabled(isSaving || editedTitle.trimmingCharacters(in: .whitespaces).isEmpty)
+                Button("addEdit.save".localized) { saveChanges() }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(isSaving || editedTitle.trimmingCharacters(in: .whitespaces).isEmpty)
             } else {
                 Button {
                     startEditing()
@@ -248,16 +277,18 @@ struct PasswordDetailViewNew: View {
         .frame(maxWidth: 232)
     }
 
-    // MARK: - Shared Section Builders
-
     @ViewBuilder
-    private func detailFieldSection<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+    private func detailFieldSection<Content: View>(title: String, requirementKey: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 9) {
-            Text(title)
-                .font(.system(size: 12, weight: .semibold))
-                .tracking(0.2)
-                .foregroundColor(AppColors.mutedForeground)
-
+            HStack(spacing: 5) {
+                Text(title)
+                    .font(.system(size: 12, weight: .semibold))
+                    .tracking(0.2)
+                    .foregroundColor(AppColors.mutedForeground)
+                Text(requirementKey)
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundColor(AppColors.mutedForeground.opacity(0.7))
+            }
             content()
         }
     }
@@ -286,24 +317,14 @@ struct PasswordDetailViewNew: View {
 
     @ViewBuilder
     private var metadataDivider: some View {
-        Rectangle()
-            .fill(AppColors.border)
-            .frame(height: 1)
-            .padding(.vertical, 4)
+        Rectangle().fill(AppColors.border).frame(height: 1).padding(.vertical, 4)
     }
-
-    // MARK: - Delete Button
 
     @ViewBuilder
     private var deleteSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Rectangle()
-                .fill(AppColors.border)
-                .frame(height: 1)
-
-            Button(role: .destructive) {
-                showingDeleteConfirmation = true
-            } label: {
+            Rectangle().fill(AppColors.border).frame(height: 1)
+            Button(role: .destructive) { showingDeleteConfirmation = true } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "trash")
                     Text("detail.deletePassword".localized)
@@ -314,14 +335,23 @@ struct PasswordDetailViewNew: View {
         .padding(.top, 4)
     }
 
-    // MARK: - Actions
+    private func loadCustomCategories() {
+        do {
+            customCategories = try repository.fetchCustomCategories()
+        } catch {
+            validationMessage = error.localizedDescription
+        }
+    }
 
     private func startEditing() {
         editedTitle = item.title
         editedUsername = item.username
         editedPassword = item.password
+        editedPhoneNumber = item.phoneNumber
+        editedEmail = item.email
         editedNotes = item.notes
         showEditedPassword = true
+        validationMessage = nil
 
         if let cat = PasswordCategory.allCases.first(where: { $0.rawValue == item.category }) {
             editedCategory = cat.localizedName
@@ -335,9 +365,20 @@ struct PasswordDetailViewNew: View {
     private func cancelEditing() {
         isEditing = false
         isSaving = false
+        validationMessage = nil
     }
 
     private func saveChanges() {
+        validationMessage = nil
+        if !AccountFieldValidator.isValidPhoneNumber(editedPhoneNumber) {
+            validationMessage = "validation.phone.invalid".localized
+            return
+        }
+        if !AccountFieldValidator.isValidEmail(editedEmail) {
+            validationMessage = "validation.email.invalid".localized
+            return
+        }
+
         let categoryRawValue = PasswordCategory.allCases.first(where: { $0.localizedName == editedCategory })?.rawValue ?? editedCategory
 
         let updatedItem = DecryptedPasswordItem(
@@ -346,6 +387,8 @@ struct PasswordDetailViewNew: View {
             title: editedTitle.trimmingCharacters(in: .whitespaces),
             username: editedUsername,
             password: editedPassword,
+            phoneNumber: editedPhoneNumber,
+            email: editedEmail,
             notes: editedNotes,
             createdAt: item.createdAt,
             updatedAt: Date()

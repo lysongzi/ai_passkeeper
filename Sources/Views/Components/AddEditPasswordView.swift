@@ -21,12 +21,10 @@ struct AddEditPasswordViewNew: View {
                 PKModalHeader(
                     title: editingItem == nil ? "main.addNewPassword".localized : "main.addPassword".localized,
                     left: {
-                        Button("addEdit.cancel".localized) {
-                            dismiss()
-                        }
-                        .buttonStyle(.plain)
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(AppColors.mutedForeground)
+                        Button("addEdit.cancel".localized) { dismiss() }
+                            .buttonStyle(.plain)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(AppColors.mutedForeground)
                     },
                     right: {
                         PKModalActionButton(
@@ -65,7 +63,7 @@ struct AddEditPasswordViewNew: View {
                                 )
                         }
 
-                        fieldSection(title: "addEdit.titleField".localized, required: true) {
+                        fieldSection(title: "addEdit.titleField".localized, requirementKey: "field.required".localized) {
                             PKFieldContainer {
                                 TextField(text: $viewModel.title, prompt: Text("addEdit.placeholder.title".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
                                     .textFieldStyle(.plain)
@@ -73,7 +71,7 @@ struct AddEditPasswordViewNew: View {
                             }
                         }
 
-                        fieldSection(title: "addEdit.username".localized, required: true) {
+                        fieldSection(title: "addEdit.username".localized, requirementKey: "field.required".localized) {
                             PKFieldContainer {
                                 TextField(text: $viewModel.username, prompt: Text("addEdit.placeholder.username".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
                                     .textFieldStyle(.plain)
@@ -81,7 +79,7 @@ struct AddEditPasswordViewNew: View {
                             }
                         }
 
-                        fieldSection(title: "detail.password".localized, required: true) {
+                        fieldSection(title: "detail.password".localized, requirementKey: "field.required".localized) {
                             HStack(spacing: AppSpacing.sm) {
                                 PKFieldContainer {
                                     Group {
@@ -99,14 +97,27 @@ struct AddEditPasswordViewNew: View {
                             }
                         }
 
-                        fieldSection(title: "addEdit.category".localized, required: true) {
-                            PKCategoryPicker(
-                                categories: viewModel.categories,
-                                selection: $viewModel.category
-                            )
+                        fieldSection(title: "addEdit.category".localized, requirementKey: "field.required".localized) {
+                            PKCategoryPicker(categories: viewModel.categories, selection: $viewModel.category)
                         }
 
-                        fieldSection(title: "detail.notes".localized, optional: true) {
+                        fieldSection(title: "detail.phone".localized, requirementKey: "field.optional".localized) {
+                            PKFieldContainer {
+                                TextField(text: $viewModel.phoneNumber, prompt: Text("addEdit.placeholder.phone".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
+                                    .textFieldStyle(.plain)
+                                    .font(.system(size: 14, weight: .medium))
+                            }
+                        }
+
+                        fieldSection(title: "detail.email".localized, requirementKey: "field.optional".localized) {
+                            PKFieldContainer {
+                                TextField(text: $viewModel.email, prompt: Text("addEdit.placeholder.email".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
+                                    .textFieldStyle(.plain)
+                                    .font(.system(size: 14, weight: .medium))
+                            }
+                        }
+
+                        fieldSection(title: "detail.notes".localized, requirementKey: "field.optional".localized) {
                             TextEditor(text: $viewModel.notes)
                                 .font(.system(size: 14, weight: .regular))
                                 .frame(minHeight: 66)
@@ -136,6 +147,7 @@ struct AddEditPasswordViewNew: View {
             .shadow(color: AppElevation.modalShadow, radius: 22, x: 0, y: 10)
         }
         .task {
+            viewModel.loadCustomCategories()
             if let editingItem {
                 viewModel.loadItem(editingItem)
             }
@@ -144,28 +156,19 @@ struct AddEditPasswordViewNew: View {
 
     private func fieldSection<Content: View>(
         title: String,
-        required: Bool = false,
-        optional: Bool = false,
+        requirementKey: String,
         @ViewBuilder content: () -> Content
     ) -> some View {
         VStack(alignment: .leading, spacing: 9) {
             HStack(spacing: 5) {
-                if required {
-                    Circle()
-                        .fill(Color.red)
-                        .frame(width: 5, height: 5)
-                }
                 Text(title)
                     .font(.system(size: 12, weight: .semibold))
                     .tracking(0.2)
                     .foregroundColor(AppColors.mutedForeground)
-                if optional {
-                    Text("（选填）")
-                        .font(.system(size: 12, weight: .regular))
-                        .foregroundColor(AppColors.mutedForeground.opacity(0.7))
-                }
+                Text(requirementKey)
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundColor(AppColors.mutedForeground.opacity(0.7))
             }
-
             content()
         }
     }
