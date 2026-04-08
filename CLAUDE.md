@@ -1,9 +1,9 @@
 # AI PassKeeper - Claude Code 配置
 
 ## 项目概述
-- **项目类型**: 密码管理器 iOS 应用
+- **项目类型**: 密码管理器 macOS 应用
 - **主要功能**: 安全存储和管理用户密码
-- **技术栈**: Swift, SwiftUI, iOS
+- **技术栈**: Swift, SwiftUI, macOS
 
 ## 常用 Skills 配置
 
