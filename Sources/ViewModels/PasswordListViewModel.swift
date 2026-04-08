@@ -10,30 +10,27 @@ final class PasswordListViewModel: ObservableObject {
     @Published var selectedCategory: String = "category.all".localized
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published private(set) var customCategories: [CustomCategory] = []
 
     private let repository = PasswordRepository()
     private var cancellables = Set<AnyCancellable>()
 
-    // 动态计算 categories 以响应语言变化
     var categories: [String] {
-        ["category.all".localized] + PasswordCategory.allCases.map { $0.localizedName }
+        ["category.all".localized] + PasswordCategory.allCases.map { $0.localizedName } + customCategories.map(\.name)
     }
 
     init() {
         setupSearchObserver()
         setupVaultLockObserver()
+        loadCustomCategories()
     }
-
-    // MARK: - Setup
 
     private func setupSearchObserver() {
         $searchText
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] query in
-                Task {
-                    await self?.performSearch(query: query)
-                }
+                Task { await self?.performSearch(query: query) }
             }
             .store(in: &cancellables)
     }
@@ -46,18 +43,28 @@ final class PasswordListViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    // MARK: - Data Loading
+    func loadCustomCategories() {
+        do {
+            customCategories = try repository.fetchCustomCategories()
+            normalizeSelectedCategoryIfNeeded()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func refreshCategoriesAndPasswords() async {
+        loadCustomCategories()
+        await loadPasswords()
+    }
 
     func loadPasswords() async {
         isLoading = true
         errorMessage = nil
 
         do {
-            // Compare with English key internally
             if selectedCategory == "category.all".localized || selectedCategory == "All" {
                 passwords = try await repository.fetchAllItems()
             } else {
-                // Convert localized category back to English for storage
                 let matchingCategory = PasswordCategory.allCases.first { $0.localizedName == selectedCategory }
                 let categoryKey = matchingCategory?.rawValue ?? selectedCategory
                 passwords = try await repository.fetchItems(category: categoryKey)
@@ -74,8 +81,6 @@ final class PasswordListViewModel: ObservableObject {
         await loadPasswords()
     }
 
-    // MARK: - Search
-
     private func performSearch(query: String) async {
         guard !query.isEmpty else {
             await loadPasswords()
@@ -83,17 +88,13 @@ final class PasswordListViewModel: ObservableObject {
         }
 
         isLoading = true
-
         do {
             passwords = try await repository.searchItems(query: query)
         } catch {
             errorMessage = error.localizedDescription
         }
-
         isLoading = false
     }
-
-    // MARK: - Actions
 
     func updatePassword(_ item: DecryptedPasswordItem) async {
         do {
@@ -103,6 +104,8 @@ final class PasswordListViewModel: ObservableObject {
                 username: item.username,
                 password: item.password,
                 category: item.category,
+                phoneNumber: item.phoneNumber,
+                email: item.email,
                 notes: item.notes
             )
             if let index = passwords.firstIndex(where: { $0.id == item.id }) {
@@ -122,17 +125,34 @@ final class PasswordListViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Security
-
     private func clearSensitiveData() {
-        // Clear passwords from memory
         passwords = []
     }
 
     func securelyClearAllData() {
-        // Overwrite sensitive data in memory
         passwords = []
         searchText = ""
-        selectedCategory = "All"
+        selectedCategory = "category.all".localized
+    }
+
+    private func normalizeSelectedCategoryIfNeeded() {
+        let current = selectedCategory
+        if current == "All" {
+            selectedCategory = "category.all".localized
+            return
+        }
+
+        let builtInLocalized = Set(PasswordCategory.allCases.map(\.localizedName))
+        if current == "category.all".localized || builtInLocalized.contains(current) || customCategories.map(\.name).contains(current) {
+            return
+        }
+
+        if PasswordCategory.allCases.map(\.rawValue).contains(current),
+           let localized = PasswordCategory.allCases.first(where: { $0.rawValue == current })?.localizedName {
+            selectedCategory = localized
+            return
+        }
+
+        selectedCategory = "category.all".localized
     }
 }

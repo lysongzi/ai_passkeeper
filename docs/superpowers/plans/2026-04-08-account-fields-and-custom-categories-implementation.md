@@ -4,7 +4,7 @@
 
 **Goal:** Add optional phone/email fields to password records, unify add/edit/detail field presentation, and support user-managed custom categories in settings, selectors, and main-page filtering.
 
-**Architecture:** Extend the existing password record model and SQLite schema in place, then layer a lightweight custom-category persistence path alongside the existing built-in category model. UI work stays inside the current SwiftUI MVVM structure, with shared validation and category-source helpers feeding add/edit/detail/settings/main-screen flows.
+**Architecture:** Extend the existing password record model and SQLite schema in place, then add a lightweight custom-category persistence path alongside the built-in category enum. UI work stays inside the current SwiftUI MVVM structure, with shared validation and category-source helpers feeding add/edit/detail/settings/sidebar flows.
 
 **Tech Stack:** Swift, SwiftUI, SQLite.swift, XCTest/Xcodebuild, existing i18n service
 
@@ -13,118 +13,111 @@
 ## File map
 
 ### Existing files likely to modify
-- `Sources/Models/PasswordItem.swift` — add phone/email fields and possibly custom category helper types.
-- `Sources/Services/Storage/DatabaseManager.swift` — schema migration, CRUD, search query expansion, custom categories persistence if storage stays centralized.
-- `Sources/Services/Storage/PasswordRepository.swift` — repository APIs for new fields and custom-category operations.
-- `Sources/ViewModels/AddEditPasswordViewModel.swift` — form state, validation, save payload, category source updates.
-- `Sources/ViewModels/PasswordListViewModel.swift` — category filter data source and refresh behavior.
-- `Sources/ViewModels/SettingsViewModel.swift` — custom-category CRUD orchestration.
-- `Sources/Views/Components/AddEditPasswordView.swift` — insert phone/email fields, unify required/optional labels.
-- `Sources/Views/Components/PasswordDetailView.swift` — display/edit phone/email in the unified order.
-- `Sources/Views/Components/SidebarView.swift` — include custom categories in main-page quick filters.
-- `Sources/Views/Components/SettingsView.swift` — add category-management UI.
-- `Sources/Services/I18nService.swift` or localization backing files — add strings for new labels/errors/category-management copy.
+- `Sources/Models/PasswordItem.swift` - add phone/email fields to encrypted and decrypted item models and widen search-index generation.
+- `Sources/Services/Storage/DatabaseManager.swift` - add schema migration for new password columns, add custom category table, expand CRUD and search queries.
+- `Sources/Services/Storage/PasswordRepository.swift` - widen read/write APIs for phone/email and add custom-category CRUD methods.
+- `Sources/ViewModels/AddEditPasswordViewModel.swift` - track phone/email field state, validation, and merged category options.
+- `Sources/ViewModels/PasswordListViewModel.swift` - expose merged categories for sidebar filters and preserve custom categories across language changes.
+- `Sources/ViewModels/SettingsViewModel.swift` - load and mutate custom categories, surface delete-in-use errors.
+- `Sources/Views/Components/AddEditPasswordView.swift` - insert phone/email rows and unify required/optional labels.
+- `Sources/Views/Components/PasswordDetailView.swift` - show/edit phone/email in the approved field order.
+- `Sources/Views/Components/SidebarView.swift` - include custom categories in the quick filter list.
+- `Sources/Views/Components/SettingsView.swift` - add custom-category management UI.
+- `Resources/en.lproj/Localizable.strings` - add English copy for labels, placeholders, validation, and category management.
+- `Resources/zh-Hans.lproj/Localizable.strings` - add Simplified Chinese copy for labels, placeholders, validation, and category management.
+- `SourcesTests/PassKeeperTests.swift` - extend model/search-index coverage.
+- `SourcesTests/PasswordUpdateTests.swift` - extend update helper coverage for new fields.
 
-### Possible new files
-- `Sources/Models/CustomCategory.swift` — explicit model for user-defined categories if not embedded into `PasswordItem.swift`.
-- `Sources/Services/Validation/AccountFieldValidator.swift` — shared phone/email validation helpers if extracting from view model keeps code smaller.
-- `Sources/Services/Storage/CategoryStore.swift` — dedicated persistence wrapper if custom-category logic would bloat `DatabaseManager.swift` too much.
-- `SourcesTests/...` — unit coverage for storage, validation, and view-model logic if a test target exists or is added.
+### New files to add
+- `Sources/Models/CustomCategory.swift` - user-defined category model and storage-layer errors.
+- `Sources/Services/Validation/AccountFieldValidator.swift` - shared loose phone/email validation helpers.
+- `SourcesTests/AccountFieldValidatorTests.swift` - validator coverage.
+- `SourcesTests/CustomCategoryStoreTests.swift` - repository/database coverage for custom categories.
 
 ---
 
-### Task 1: Document exact touch points and create the implementation branch
+### Task 1: Create the isolated implementation branch and baseline the workspace
 
 **Files:**
-- Modify: `docs/superpowers/specs/2026-04-08-account-fields-and-custom-categories-design.md`
-- Create/Modify: git branch only
+- Create/Modify: git branch/worktree only
 
-- [ ] **Step 1: Verify the approved spec is present and capture the active branch**
+- [ ] **Step 1: Verify the feature branch worktree is active**
 
 Run:
 ```bash
+pwd
 git branch --show-current
-sed -n '1,260p' docs/superpowers/specs/2026-04-08-account-fields-and-custom-categories-design.md
-```
-
-Expected:
-- Current branch prints `main` or the current integration branch.
-- The spec file exists and includes phone/email plus custom-category requirements.
-
-- [ ] **Step 2: Create a feature branch for this proposal**
-
-Run:
-```bash
-git checkout -b feature/account-fields-custom-categories
-```
-
-Expected:
-- Git reports a new branch named `feature/account-fields-custom-categories`.
-
-- [ ] **Step 3: Reconfirm working tree status before code changes**
-
-Run:
-```bash
 git status --short
 ```
 
 Expected:
-- Only known unrelated files remain, and the new branch is active.
+- The working directory is `.worktrees/feature-account-fields-custom-categories`.
+- The current branch is `feature/account-fields-custom-categories`.
+- The worktree is clean before code changes.
 
-- [ ] **Step 4: Commit if any branch-only metadata or plan note was updated**
-
-```bash
-git add docs/superpowers/specs/2026-04-08-account-fields-and-custom-categories-design.md
-# Commit only if Step 1-3 caused tracked file changes; otherwise skip commit for this task.
-```
-
-### Task 2: Add password-record phone/email fields and database migration support
-
-**Files:**
-- Modify: `Sources/Models/PasswordItem.swift`
-- Modify: `Sources/Services/Storage/DatabaseManager.swift`
-- Modify: `Sources/Services/Storage/PasswordRepository.swift`
-- Test: storage-focused XCTest file if available, otherwise add a new focused test file under the existing test target
-
-- [ ] **Step 1: Write the failing storage test for phone/email persistence and search coverage**
-
-```swift
-func testPasswordItemPersistsPhoneAndEmailAndSearchCanFindThem() async throws {
-    let repository = PasswordRepository(databaseManager: testDatabaseManager, securityService: testSecurityService)
-
-    let item = try await repository.addItem(
-        title: "GitHub",
-        username: "octocat",
-        password: "Secret123!",
-        category: "General",
-        phoneNumber: "+1 415 555 0101",
-        email: "octo@example.com",
-        notes: "work account"
-    )
-
-    let fetched = try await repository.getItem(id: item.id)
-    XCTAssertEqual(fetched?.phoneNumber, "+1 415 555 0101")
-    XCTAssertEqual(fetched?.email, "octo@example.com")
-
-    let phoneMatches = try await repository.searchItems(query: "415 555")
-    XCTAssertTrue(phoneMatches.contains(where: { $0.id == item.id }))
-
-    let emailMatches = try await repository.searchItems(query: "octo@example.com")
-    XCTAssertTrue(emailMatches.contains(where: { $0.id == item.id }))
-}
-```
-
-- [ ] **Step 2: Run the targeted test to verify it fails**
+- [ ] **Step 2: Confirm the approved design doc is available inside the worktree**
 
 Run:
 ```bash
-xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:SourcesTests/<StorageTestClass>/testPasswordItemPersistsPhoneAndEmailAndSearchCanFindThem
+sed -n '1,240p' docs/superpowers/specs/2026-04-08-account-fields-and-custom-categories-design.md
 ```
 
 Expected:
-- Build/test fails because repository/model APIs do not yet accept or return phone/email fields.
+- The spec includes phone/email support, custom categories, search participation, and delete-in-use restriction.
 
-- [ ] **Step 3: Implement the minimal model, schema, migration, CRUD, and search changes**
+- [ ] **Step 3: Record the existing test targets and baseline build command**
+
+Run:
+```bash
+xcodebuild -list -project PasswordManager.xcodeproj
+```
+
+Expected:
+- The project exposes the `PasswordManager` scheme and the `PasswordManagerTests` target.
+
+### Task 2: Extend the password item models and search-index tests for phone/email
+
+**Files:**
+- Modify: `Sources/Models/PasswordItem.swift`
+- Modify: `SourcesTests/PassKeeperTests.swift`
+- Modify: `SourcesTests/PasswordUpdateTests.swift`
+
+- [ ] **Step 1: Add failing model tests for phone/email fields and search index expansion**
+
+```swift
+func testSearchIndexCreationIncludesPhoneAndEmail() {
+    let index = PasswordItem.createSearchIndex(
+        title: "Google",
+        username: "user@gmail.com",
+        phoneNumber: "+1 415 555 0101",
+        email: "user@work.com"
+    )
+
+    XCTAssertTrue(index.contains("google"))
+    XCTAssertTrue(index.contains("user@gmail.com"))
+    XCTAssertTrue(index.contains("+1 415 555 0101".lowercased()))
+    XCTAssertTrue(index.contains("user@work.com"))
+}
+
+func testUpdatedItemReflectsNewPhoneAndEmail() {
+    let original = makeItem(phoneNumber: "", email: "")
+    let updated = makeUpdatedItem(from: original, phoneNumber: "+86 13800138000", email: "new@example.com")
+    XCTAssertEqual(updated.phoneNumber, "+86 13800138000")
+    XCTAssertEqual(updated.email, "new@example.com")
+}
+```
+
+- [ ] **Step 2: Run the focused model tests to verify they fail**
+
+Run:
+```bash
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/PasswordItemTests -only-testing:PasswordManagerTests/PasswordUpdateTests
+```
+
+Expected:
+- Tests fail because `PasswordItem`, `DecryptedPasswordItem`, and helper methods do not yet include phone/email fields.
+
+- [ ] **Step 3: Implement the minimal model changes**
 
 ```swift
 struct PasswordItem: Identifiable, Codable, Equatable {
@@ -146,13 +139,92 @@ struct PasswordItem: Identifiable, Codable, Equatable {
         phoneNumber: String,
         email: String
     ) -> [String] {
-        let normalized = [title, username, phoneNumber, email]
+        let values = [title, username, phoneNumber, email]
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
             .filter { !$0.isEmpty }
-        return normalized + [normalized.joined(separator: " ")]
+        return values + [values.joined(separator: " ")]
     }
 }
+
+struct DecryptedPasswordItem: Identifiable, Equatable {
+    let id: UUID
+    var category: String
+    var title: String
+    var username: String
+    var password: String
+    var phoneNumber: String
+    var email: String
+    var notes: String
+    var createdAt: Date
+    var updatedAt: Date
+}
 ```
+
+- [ ] **Step 4: Run the focused model tests to verify they pass**
+
+Run:
+```bash
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/PasswordItemTests -only-testing:PasswordManagerTests/PasswordUpdateTests
+```
+
+Expected:
+- Both test classes pass.
+
+- [ ] **Step 5: Commit the model changes**
+
+```bash
+git add Sources/Models/PasswordItem.swift SourcesTests/PassKeeperTests.swift SourcesTests/PasswordUpdateTests.swift
+git commit -m "feat: add phone and email fields to password items"
+```
+
+### Task 3: Add database migration and repository support for phone/email fields
+
+**Files:**
+- Modify: `Sources/Services/Storage/DatabaseManager.swift`
+- Modify: `Sources/Services/Storage/PasswordRepository.swift`
+
+- [ ] **Step 1: Add a failing repository/database test for phone/email persistence and search**
+
+```swift
+func testRepositoryCanPersistAndSearchPhoneAndEmail() async throws {
+    let repository = PasswordRepository()
+
+    let created = try await repository.addItem(
+        title: "GitHub",
+        username: "octocat",
+        password: "Secret123!",
+        category: "General",
+        phoneNumber: "+1 415 555 0101",
+        email: "octo@example.com",
+        notes: "work"
+    )
+
+    XCTAssertEqual(created.phoneNumber, "+1 415 555 0101")
+    XCTAssertEqual(created.email, "octo@example.com")
+
+    let fetched = try await repository.fetchItem(id: created.id)
+    XCTAssertEqual(fetched?.phoneNumber, "+1 415 555 0101")
+    XCTAssertEqual(fetched?.email, "octo@example.com")
+
+    let phoneMatches = try await repository.searchItems(query: "415 555")
+    XCTAssertTrue(phoneMatches.contains(where: { $0.id == created.id }))
+
+    let emailMatches = try await repository.searchItems(query: "octo@example.com")
+    XCTAssertTrue(emailMatches.contains(where: { $0.id == created.id }))
+}
+```
+
+- [ ] **Step 2: Run the repository persistence test to verify it fails**
+
+Run:
+```bash
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/PassKeeperTests/testRepositoryCanPersistAndSearchPhoneAndEmail
+```
+
+Expected:
+- The test fails because repository methods and database schema do not yet accept or return phone/email fields.
+
+- [ ] **Step 3: Implement the schema migration and repository wiring**
 
 ```swift
 private let colPhoneNumber = SQLite.Expression<String>("phoneNumber")
@@ -179,6 +251,18 @@ private func createTables() throws {
 ```
 
 ```swift
+func addItem(
+    title: String,
+    username: String,
+    password: String,
+    category: String,
+    phoneNumber: String,
+    email: String,
+    notes: String
+) async throws -> DecryptedPasswordItem
+```
+
+```swift
 let searchQuery = passwords.filter(
     colTitle.lowercaseString.like("%\(lowercasedQuery)%") ||
     colUsername.lowercaseString.like("%\(lowercasedQuery)%") ||
@@ -188,75 +272,61 @@ let searchQuery = passwords.filter(
 )
 ```
 
-- [ ] **Step 4: Run the targeted storage test to verify it passes**
+- [ ] **Step 4: Run the repository persistence test to verify it passes**
 
 Run:
 ```bash
-xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:SourcesTests/<StorageTestClass>/testPasswordItemPersistsPhoneAndEmailAndSearchCanFindThem
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/PassKeeperTests/testRepositoryCanPersistAndSearchPhoneAndEmail
 ```
 
 Expected:
 - The targeted test passes.
 
-- [ ] **Step 5: Commit the storage/model change**
+- [ ] **Step 5: Commit the storage/repository changes**
 
 ```bash
-git add Sources/Models/PasswordItem.swift Sources/Services/Storage/DatabaseManager.swift Sources/Services/Storage/PasswordRepository.swift SourcesTests
-git commit -m "feat: add phone and email storage for password items"
+git add Sources/Services/Storage/DatabaseManager.swift Sources/Services/Storage/PasswordRepository.swift
+git commit -m "feat: persist and search phone and email fields"
 ```
 
-### Task 3: Add shared validation and form/view-model support for phone/email plus unified field semantics
+### Task 4: Add shared account-field validation and update add/edit form behavior
 
 **Files:**
+- Create: `Sources/Services/Validation/AccountFieldValidator.swift`
+- Create: `SourcesTests/AccountFieldValidatorTests.swift`
 - Modify: `Sources/ViewModels/AddEditPasswordViewModel.swift`
 - Modify: `Sources/Views/Components/AddEditPasswordView.swift`
-- Modify: `Sources/Services/I18nService.swift` or localization resources
-- Create: `Sources/Services/Validation/AccountFieldValidator.swift` if extraction improves reuse
-- Test: view-model/validator XCTest file
+- Modify: `Resources/en.lproj/Localizable.strings`
+- Modify: `Resources/zh-Hans.lproj/Localizable.strings`
 
-- [ ] **Step 1: Write the failing validation tests for optional email and loose phone rules**
+- [ ] **Step 1: Add failing validator tests for optional email and loose phone rules**
 
 ```swift
-func testSaveRejectsInvalidEmailButAllowsEmptyPhoneAndEmail() async throws {
-    let viewModel = AddEditPasswordViewModel(repository: repository)
-    viewModel.title = "GitHub"
-    viewModel.username = "octocat"
-    viewModel.password = "Secret123!"
-    viewModel.category = PasswordCategory.general.localizedName
-    viewModel.email = "invalid-email"
-
-    let saved = await viewModel.save()
-
-    XCTAssertFalse(saved)
-    XCTAssertEqual(viewModel.errorMessage, "validation.email.invalid".localized)
+func testEmailValidationAllowsEmptyAndRejectsMalformedAddress() {
+    XCTAssertTrue(AccountFieldValidator.isValidEmail(""))
+    XCTAssertFalse(AccountFieldValidator.isValidEmail("invalid-email"))
+    XCTAssertTrue(AccountFieldValidator.isValidEmail("person@example.com"))
 }
 
-func testSaveRejectsClearlyInvalidPhoneNumber() async throws {
-    let viewModel = AddEditPasswordViewModel(repository: repository)
-    viewModel.title = "GitHub"
-    viewModel.username = "octocat"
-    viewModel.password = "Secret123!"
-    viewModel.category = PasswordCategory.general.localizedName
-    viewModel.phoneNumber = "12"
-
-    let saved = await viewModel.save()
-
-    XCTAssertFalse(saved)
-    XCTAssertEqual(viewModel.errorMessage, "validation.phone.invalid".localized)
+func testPhoneValidationAllowsLooseFormatsButRejectsTooShortInput() {
+    XCTAssertTrue(AccountFieldValidator.isValidPhoneNumber(""))
+    XCTAssertTrue(AccountFieldValidator.isValidPhoneNumber("+86 138-0013-8000"))
+    XCTAssertTrue(AccountFieldValidator.isValidPhoneNumber("(415) 555 0101"))
+    XCTAssertFalse(AccountFieldValidator.isValidPhoneNumber("12"))
 }
 ```
 
-- [ ] **Step 2: Run the targeted validation test to verify it fails**
+- [ ] **Step 2: Run the validator tests to verify they fail**
 
 Run:
 ```bash
-xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:SourcesTests/<ValidationTestClass>
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/AccountFieldValidatorTests
 ```
 
 Expected:
-- Tests fail because phone/email fields and validation behavior are missing.
+- The test target fails because the validator type does not yet exist.
 
-- [ ] **Step 3: Implement validator helpers, view-model state, save wiring, and unified form labels**
+- [ ] **Step 3: Implement validator helpers and add/edit wiring**
 
 ```swift
 enum AccountFieldValidator {
@@ -270,9 +340,9 @@ enum AccountFieldValidator {
     static func isValidPhoneNumber(_ value: String) -> Bool {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty { return true }
-        let normalized = trimmed.replacingOccurrences(of: #"[\s\-\(\)]"#, with: "", options: .regularExpression)
+        let cleaned = trimmed.replacingOccurrences(of: #"[\s\-\(\)]"#, with: "", options: .regularExpression)
         let allowed = CharacterSet(charactersIn: "+0123456789")
-        return normalized.count >= 6 && normalized.count <= 20 && normalized.unicodeScalars.allSatisfy(allowed.contains)
+        return cleaned.count >= 6 && cleaned.count <= 20 && cleaned.unicodeScalars.allSatisfy(allowed.contains)
     }
 }
 ```
@@ -294,133 +364,144 @@ private func validateOptionalFields() -> String? {
 
 ```swift
 fieldSection(title: "detail.phone".localized, optional: true) {
-    TextField(text: $viewModel.phoneNumber, prompt: Text("addEdit.placeholder.phone".localized)) { }
+    PKFieldContainer {
+        TextField(text: $viewModel.phoneNumber, prompt: Text("addEdit.placeholder.phone".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
+            .textFieldStyle(.plain)
+            .font(.system(size: 14, weight: .medium))
+    }
 }
 
 fieldSection(title: "detail.email".localized, optional: true) {
-    TextField(text: $viewModel.email, prompt: Text("addEdit.placeholder.email".localized)) { }
+    PKFieldContainer {
+        TextField(text: $viewModel.email, prompt: Text("addEdit.placeholder.email".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
+            .textFieldStyle(.plain)
+            .font(.system(size: 14, weight: .medium))
+    }
 }
 ```
 
-- [ ] **Step 4: Run the targeted validation/form tests to verify they pass**
+- [ ] **Step 4: Run the validator tests to verify they pass**
 
 Run:
 ```bash
-xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:SourcesTests/<ValidationTestClass>
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/AccountFieldValidatorTests
 ```
 
 Expected:
-- The new validation tests pass.
+- `AccountFieldValidatorTests` passes.
 
-- [ ] **Step 5: Commit the validation and add/edit form changes**
+- [ ] **Step 5: Commit the validator and add/edit updates**
 
 ```bash
-git add Sources/ViewModels/AddEditPasswordViewModel.swift Sources/Views/Components/AddEditPasswordView.swift Sources/Services/I18nService.swift Sources/Services/Validation SourcesTests
-git commit -m "feat: validate and edit phone and email fields"
+git add Sources/Services/Validation/AccountFieldValidator.swift SourcesTests/AccountFieldValidatorTests.swift Sources/ViewModels/AddEditPasswordViewModel.swift Sources/Views/Components/AddEditPasswordView.swift Resources/en.lproj/Localizable.strings Resources/zh-Hans.lproj/Localizable.strings
+git commit -m "feat: validate phone and email input fields"
 ```
 
-### Task 4: Update detail screen editing/presentation to include phone/email in the unified order
+### Task 5: Update the detail screen and list-update flow for phone/email fields
 
 **Files:**
 - Modify: `Sources/Views/Components/PasswordDetailView.swift`
-- Modify: `Sources/ViewModels/AddEditPasswordViewModel.swift` if shared state or mappers need changes
-- Test: detail-view/view-model XCTest or snapshot-style assertions if already present
+- Modify: `Sources/ViewModels/PasswordListViewModel.swift`
+- Modify: `SourcesTests/PasswordUpdateTests.swift`
 
-- [ ] **Step 1: Write the failing test covering detail mapping and save propagation for phone/email**
+- [ ] **Step 1: Add a failing update-flow test for phone/email round-trip**
 
 ```swift
-func testDetailSavePropagatesPhoneAndEmailChanges() async throws {
-    let original = DecryptedPasswordItem(
-        id: UUID(),
-        category: "General",
-        title: "GitHub",
-        username: "octocat",
-        password: "Secret123!",
-        phoneNumber: "+1 415 555 0101",
-        email: "old@example.com",
-        notes: ""
-    )
+func testUpdatePasswordPassesPhoneAndEmailToRepositoryPayload() async throws {
+    let item = makeItem(phoneNumber: "+1 415 555 0101", email: "old@example.com")
+    let updated = makeUpdatedItem(from: item, phoneNumber: "+1 415 555 0202", email: "new@example.com")
 
-    var savedItem: DecryptedPasswordItem?
-    let view = PasswordDetailViewNew(item: original, onSave: { updated in savedItem = updated })
-
-    // test harness drives edit fields then save
-    XCTAssertEqual(savedItem?.phoneNumber, "+1 415 555 0202")
-    XCTAssertEqual(savedItem?.email, "new@example.com")
+    XCTAssertEqual(updated.phoneNumber, "+1 415 555 0202")
+    XCTAssertEqual(updated.email, "new@example.com")
 }
 ```
 
-- [ ] **Step 2: Run the targeted test to verify it fails**
+- [ ] **Step 2: Run the focused update-flow tests to verify they fail**
 
 Run:
 ```bash
-xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:SourcesTests/<DetailTestClass>
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/PasswordUpdateTests
 ```
 
 Expected:
-- Tests fail because detail view/item models do not yet carry phone/email.
+- The tests fail because detail-save/update flows do not yet carry phone/email data.
 
-- [ ] **Step 3: Implement the minimal detail-view changes**
-
-```swift
-struct DecryptedPasswordItem: Identifiable, Equatable {
-    let id: UUID
-    var category: String
-    var title: String
-    var username: String
-    var password: String
-    var phoneNumber: String
-    var email: String
-    var notes: String
-    var createdAt: Date
-    var updatedAt: Date
-}
-```
+- [ ] **Step 3: Implement the detail-screen and list-update changes**
 
 ```swift
 @State private var editedPhoneNumber: String = ""
 @State private var editedEmail: String = ""
 
-editableFieldSection(title: "detail.phone".localized, optional: true, text: $editedPhoneNumber)
-editableFieldSection(title: "detail.email".localized, optional: true, text: $editedEmail)
+if isEditing || !item.phoneNumber.isEmpty {
+    detailFieldSection(title: "detail.phone".localized) {
+        if isEditing {
+            editableTextField(text: $editedPhoneNumber, placeholder: "detail.phone".localized)
+        } else {
+            PKFieldContainer { Text(item.phoneNumber) }
+        }
+    }
+}
+
+if isEditing || !item.email.isEmpty {
+    detailFieldSection(title: "detail.email".localized) {
+        if isEditing {
+            editableTextField(text: $editedEmail, placeholder: "detail.email".localized)
+        } else {
+            PKFieldContainer { Text(item.email) }
+        }
+    }
+}
 ```
 
-- [ ] **Step 4: Run the targeted test to verify it passes**
+```swift
+try await repository.updateItem(
+    id: item.id,
+    title: item.title,
+    username: item.username,
+    password: item.password,
+    category: item.category,
+    phoneNumber: item.phoneNumber,
+    email: item.email,
+    notes: item.notes
+)
+```
+
+- [ ] **Step 4: Run the focused update-flow tests to verify they pass**
 
 Run:
 ```bash
-xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:SourcesTests/<DetailTestClass>
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/PasswordUpdateTests
 ```
 
 Expected:
-- Detail tests pass and confirm save propagation.
+- `PasswordUpdateTests` passes with the new phone/email assertions.
 
-- [ ] **Step 5: Commit the detail-screen update**
+- [ ] **Step 5: Commit the detail/update changes**
 
 ```bash
-git add Sources/Models/PasswordItem.swift Sources/Views/Components/PasswordDetailView.swift SourcesTests
+git add Sources/Views/Components/PasswordDetailView.swift Sources/ViewModels/PasswordListViewModel.swift SourcesTests/PasswordUpdateTests.swift
 git commit -m "feat: show phone and email in password detail"
 ```
 
-### Task 5: Add custom-category persistence and deletion guardrails
+### Task 6: Add custom-category persistence and deletion guardrails
 
 **Files:**
-- Create or Modify: `Sources/Models/CustomCategory.swift`
+- Create: `Sources/Models/CustomCategory.swift`
+- Create: `SourcesTests/CustomCategoryStoreTests.swift`
 - Modify: `Sources/Services/Storage/DatabaseManager.swift`
 - Modify: `Sources/Services/Storage/PasswordRepository.swift`
 - Modify: `Sources/ViewModels/SettingsViewModel.swift`
-- Test: category storage/view-model XCTest file
 
-- [ ] **Step 1: Write the failing tests for custom-category CRUD and delete-in-use rejection**
+- [ ] **Step 1: Add failing tests for custom-category CRUD and delete-in-use rejection**
 
 ```swift
 func testCustomCategoryCRUDAndDeleteInUseProtection() async throws {
-    let repository = PasswordRepository(databaseManager: testDatabaseManager, securityService: testSecurityService)
+    let repository = PasswordRepository()
 
-    let travel = try await repository.createCustomCategory(name: "Travel")
-    XCTAssertTrue(try await repository.fetchCustomCategories().contains(where: { $0.name == "Travel" }))
+    let created = try repository.createCustomCategory(name: "Travel")
+    XCTAssertEqual(created.name, "Travel")
 
-    let renamed = try await repository.renameCustomCategory(id: travel.id, name: "Trips")
+    let renamed = try repository.updateCustomCategory(id: created.id, name: "Trips")
     XCTAssertEqual(renamed.name, "Trips")
 
     _ = try await repository.addItem(
@@ -433,23 +514,23 @@ func testCustomCategoryCRUDAndDeleteInUseProtection() async throws {
         notes: ""
     )
 
-    await XCTAssertThrowsErrorAsync(try await repository.deleteCustomCategory(id: travel.id)) { error in
+    XCTAssertThrowsError(try repository.deleteCustomCategory(id: created.id)) { error in
         XCTAssertEqual(error as? CategoryStoreError, .categoryInUse)
     }
 }
 ```
 
-- [ ] **Step 2: Run the targeted category test to verify it fails**
+- [ ] **Step 2: Run the custom-category tests to verify they fail**
 
 Run:
 ```bash
-xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:SourcesTests/<CategoryTestClass>
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/CustomCategoryStoreTests
 ```
 
 Expected:
-- Tests fail because custom-category APIs/storage do not yet exist.
+- The tests fail because custom category storage and guardrail APIs do not exist yet.
 
-- [ ] **Step 3: Implement the minimal custom-category model, table, repository APIs, and guardrails**
+- [ ] **Step 3: Implement custom-category storage and repository APIs**
 
 ```swift
 struct CustomCategory: Identifiable, Codable, Equatable {
@@ -485,24 +566,24 @@ func deleteCustomCategory(id: UUID) throws {
 }
 ```
 
-- [ ] **Step 4: Run the targeted category test to verify it passes**
+- [ ] **Step 4: Run the custom-category tests to verify they pass**
 
 Run:
 ```bash
-xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:SourcesTests/<CategoryTestClass>
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/CustomCategoryStoreTests
 ```
 
 Expected:
-- Category CRUD tests pass, including delete-in-use rejection.
+- `CustomCategoryStoreTests` passes, including delete-in-use rejection.
 
-- [ ] **Step 5: Commit the custom-category persistence changes**
+- [ ] **Step 5: Commit the custom-category storage changes**
 
 ```bash
-git add Sources/Models/CustomCategory.swift Sources/Services/Storage/DatabaseManager.swift Sources/Services/Storage/PasswordRepository.swift Sources/ViewModels/SettingsViewModel.swift SourcesTests
+git add Sources/Models/CustomCategory.swift SourcesTests/CustomCategoryStoreTests.swift Sources/Services/Storage/DatabaseManager.swift Sources/Services/Storage/PasswordRepository.swift Sources/ViewModels/SettingsViewModel.swift
 git commit -m "feat: add custom category storage and safeguards"
 ```
 
-### Task 6: Wire custom categories into add/edit selectors, main-page filters, and settings management UI
+### Task 7: Wire custom categories into add/edit selectors, sidebar filters, settings UI, and localization
 
 **Files:**
 - Modify: `Sources/ViewModels/AddEditPasswordViewModel.swift`
@@ -511,106 +592,101 @@ git commit -m "feat: add custom category storage and safeguards"
 - Modify: `Sources/Views/Components/AddEditPasswordView.swift`
 - Modify: `Sources/Views/Components/SidebarView.swift`
 - Modify: `Sources/Views/Components/SettingsView.swift`
-- Modify: localization backing files
-- Test: relevant view-model XCTest file(s)
+- Modify: `Resources/en.lproj/Localizable.strings`
+- Modify: `Resources/zh-Hans.lproj/Localizable.strings`
 
-- [ ] **Step 1: Write the failing tests for merged category source visibility across add/edit, sidebar, and settings actions**
+- [ ] **Step 1: Add failing tests for merged category visibility in forms and sidebar filters**
 
 ```swift
-func testCustomCategoriesAppearInSelectorsAndSidebarFilters() async throws {
-    let repository = FakePasswordRepository()
-    repository.customCategories = [CustomCategory(id: UUID(), name: "Travel", createdAt: .now, updatedAt: .now)]
+func testCustomCategoriesAppearInAddEditAndSidebarLists() async throws {
+    let settingsViewModel = SettingsViewModel()
+    try settingsViewModel.addCustomCategory(name: "Travel")
 
-    let addEditViewModel = AddEditPasswordViewModel(repository: repository)
+    let addEditViewModel = AddEditPasswordViewModel()
     await addEditViewModel.reloadCategories()
     XCTAssertTrue(addEditViewModel.categories.contains("Travel"))
 
-    let listViewModel = PasswordListViewModel(repository: repository)
+    let listViewModel = PasswordListViewModel()
     await listViewModel.reloadCategories()
-    XCTAssertTrue(listViewModel.availableCategories.contains("Travel"))
+    XCTAssertTrue(listViewModel.categories.contains("Travel"))
 }
 ```
 
-- [ ] **Step 2: Run the targeted selector/filter test to verify it fails**
+- [ ] **Step 2: Run the merged-category tests to verify they fail**
 
 Run:
 ```bash
-xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:SourcesTests/<SelectorTestClass>
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/CustomCategoryStoreTests -only-testing:PasswordManagerTests/PasswordUpdateTests
 ```
 
 Expected:
-- Tests fail because the UI/view-model category sources still only use built-in categories.
+- The tests fail because view models and UI still expose only built-in categories.
 
-- [ ] **Step 3: Implement merged category sourcing and settings CRUD UI**
+- [ ] **Step 3: Implement merged category sourcing and settings management UI**
 
 ```swift
-@MainActor
+@Published var categories: [String] = []
+
 func reloadCategories() async {
     let builtIn = PasswordCategory.allCases.map(\.localizedName)
-    let custom = (try? await repository.fetchCustomCategories())?.map(\.name) ?? []
+    let custom = (try? repository.fetchCustomCategories())?.map(\.name) ?? []
     categories = builtIn + custom
 }
 ```
 
 ```swift
-Section(header: Text("settings.categories.custom".localized)) {
-    ForEach(viewModel.customCategories) { category in
-        CustomCategoryRow(
-            category: category,
-            onRename: { newName in await viewModel.renameCategory(category.id, to: newName) },
-            onDelete: { await viewModel.deleteCategory(category.id) }
-        )
-    }
+@Published var customCategories: [CustomCategory] = []
+@Published var customCategoryError: String?
 
-    Button("settings.categories.add".localized) {
-        viewModel.isPresentingAddCategory = true
-    }
+func loadCustomCategories() {
+    customCategories = (try? repository.fetchCustomCategories()) ?? []
 }
 ```
 
 ```swift
-ForEach(viewModel.availableCategories, id: \.self) { category in
-    CategoryFilterChip(
-        title: category,
-        isSelected: viewModel.selectedCategory == category,
-        onTap: { viewModel.selectCategory(category) }
+settingsSection(title: "settings.categories".localized) {
+    settingsReadOnlyRow(
+        title: "settings.categories.system".localized,
+        value: PasswordCategory.allCases.map(\.localizedName).joined(separator: ", ")
     )
+
+    CustomCategoryManagementSection(viewModel: viewModel)
 }
 ```
 
-- [ ] **Step 4: Run the targeted selector/filter tests to verify they pass**
+- [ ] **Step 4: Run the merged-category tests to verify they pass**
 
 Run:
 ```bash
-xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:SourcesTests/<SelectorTestClass>
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/CustomCategoryStoreTests -only-testing:PasswordManagerTests/PasswordUpdateTests
 ```
 
 Expected:
-- Tests pass and confirm custom categories flow through selectors and filters.
+- The merged-category tests pass and the UI data sources include custom categories.
 
-- [ ] **Step 5: Commit the UI wiring for custom categories**
+- [ ] **Step 5: Commit the selector/filter/settings UI changes**
 
 ```bash
-git add Sources/ViewModels/AddEditPasswordViewModel.swift Sources/ViewModels/PasswordListViewModel.swift Sources/ViewModels/SettingsViewModel.swift Sources/Views/Components/AddEditPasswordView.swift Sources/Views/Components/SidebarView.swift Sources/Views/Components/SettingsView.swift Sources/Services/I18nService.swift SourcesTests
-git commit -m "feat: wire custom categories into forms and filters"
+git add Sources/ViewModels/AddEditPasswordViewModel.swift Sources/ViewModels/PasswordListViewModel.swift Sources/ViewModels/SettingsViewModel.swift Sources/Views/Components/AddEditPasswordView.swift Sources/Views/Components/SidebarView.swift Sources/Views/Components/SettingsView.swift Resources/en.lproj/Localizable.strings Resources/zh-Hans.lproj/Localizable.strings
+git commit -m "feat: wire custom categories into forms settings and filters"
 ```
 
-### Task 7: Run full verification and finish the branch for review
+### Task 8: Run verification for all changed areas and prepare the branch for review
 
 **Files:**
 - Modify: any files needed to fix verification failures
 
-- [ ] **Step 1: Run the focused test targets for all changed areas**
+- [ ] **Step 1: Run the focused test classes for this feature**
 
 Run:
 ```bash
-xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:SourcesTests/<StorageTestClass> -only-testing:SourcesTests/<ValidationTestClass> -only-testing:SourcesTests/<DetailTestClass> -only-testing:SourcesTests/<CategoryTestClass> -only-testing:SourcesTests/<SelectorTestClass>
+xcodebuild test -scheme PasswordManager -project PasswordManager.xcodeproj -destination 'platform=macOS' -only-testing:PasswordManagerTests/PasswordItemTests -only-testing:PasswordManagerTests/PasswordUpdateTests -only-testing:PasswordManagerTests/AccountFieldValidatorTests -only-testing:PasswordManagerTests/CustomCategoryStoreTests
 ```
 
 Expected:
-- All targeted tests pass.
+- All focused feature tests pass.
 
-- [ ] **Step 2: Run an app build for integration verification**
+- [ ] **Step 2: Run a full macOS build for integration verification**
 
 Run:
 ```bash
@@ -618,32 +694,33 @@ TMPDIR=/tmp xcodebuild -scheme PasswordManager -project PasswordManager.xcodepro
 ```
 
 Expected:
-- Build succeeds with no new compile errors.
+- The app builds successfully with no new compile errors.
 
-- [ ] **Step 3: Sanity-check git diff and status**
+- [ ] **Step 3: Inspect the branch state and recent commits**
 
 Run:
 ```bash
 git status --short
-git log --oneline --decorate -5
+git log --oneline --decorate -6
 ```
 
 Expected:
-- Only intended files changed.
-- Recent commits reflect storage, validation/detail, and custom-category work.
+- Only intentional feature files are modified.
+- The recent commit history shows the incremental feature slices from Tasks 2-7.
 
 - [ ] **Step 4: Commit any last verification fixes**
 
 ```bash
-git add Sources docs/superpowers/plans docs/superpowers/specs SourcesTests
+git add Sources SourcesTests Resources docs/superpowers/plans
 git commit -m "test: finalize account fields and custom categories verification"
 ```
 
-- [ ] **Step 5: Prepare review summary**
+- [ ] **Step 5: Prepare the review summary**
 
 Include in handoff:
 ```text
 - Branch: feature/account-fields-custom-categories
-- Verified via targeted tests and full macOS build
-- Key areas: storage migration, validation, detail/add-edit UI, custom category settings and filters
+- Worktree: .worktrees/feature-account-fields-custom-categories
+- Verified via focused xcodebuild tests and a full macOS build
+- Key areas: password storage migration, phone/email validation, detail/add-edit UI, custom category settings and filters
 ```

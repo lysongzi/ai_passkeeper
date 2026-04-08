@@ -1,5 +1,5 @@
 import XCTest
-@testable import PasswordManager
+@testable import PassKeeper
 
 final class LightThemePaletteTests: XCTestCase {
     func testLightThemeUsesWarmPrototypeAlignedPalette() {

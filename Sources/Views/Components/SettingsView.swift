@@ -12,8 +12,12 @@ struct SettingsViewNew: View {
     @State private var newPassword = ""
     @State private var confirmPassword = ""
     @State private var isResetting = false
+    let onCategoriesChanged: (() async -> Void)?
 
-    // String proxies for PKCategoryPicker bindings
+    init(onCategoriesChanged: (() async -> Void)? = nil) {
+        self.onCategoriesChanged = onCategoriesChanged
+    }
+
     private var languageOptions: [String] {
         I18nService.Language.allCases.map { $0.displayName }
     }
@@ -66,35 +70,28 @@ struct SettingsViewNew: View {
                     },
                     right: {
                         if route == .general {
-                            PKIconButton(systemName: "xmark") {
-                                dismiss()
-                            }
+                            PKIconButton(systemName: "xmark") { dismiss() }
                         } else {
                             PKModalActionButton(
                                 title: "settings.reset".localized,
                                 isEnabled: isResetValid,
                                 isLoading: isResetting
-                            ) {
-                                Task { await resetPassword() }
-                            }
+                            ) { Task { await resetPassword() } }
                         }
                     }
                 )
 
-                Divider()
-                    .overlay(AppColors.border)
+                Divider().overlay(AppColors.border)
 
                 Group {
                     switch route {
-                    case .general:
-                        settingsContent
-                    case .resetPassword:
-                        resetPasswordContent
+                    case .general: settingsContent
+                    case .resetPassword: resetPasswordContent
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(width: 572, height: 596)
+            .frame(width: 572, height: 640)
             .background(AppColors.popover)
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             .overlay(
@@ -105,26 +102,68 @@ struct SettingsViewNew: View {
         }
     }
 
-    // MARK: - General Settings
-
     private var settingsContent: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 settingsSection(title: "settings.general".localized) {
                     settingsFieldSection(title: "settings.language".localized) {
-                        PKCategoryPicker(
-                            categories: languageOptions,
-                            selection: languageSelection,
-                            showIcons: false
-                        )
+                        PKCategoryPicker(categories: languageOptions, selection: languageSelection, showIcons: false)
+                    }
+                    settingsFieldSection(title: "settings.appearance".localized) {
+                        PKCategoryPicker(categories: appearanceOptions, selection: appearanceSelection, showIcons: false)
+                    }
+                }
+
+                settingsSection(title: "settings.category.section".localized) {
+                    if let feedback = categoryFeedbackMessage {
+                        feedbackBanner(message: feedback.message, color: feedback.color)
                     }
 
-                    settingsFieldSection(title: "settings.appearance".localized) {
-                        PKCategoryPicker(
-                            categories: appearanceOptions,
-                            selection: appearanceSelection,
-                            showIcons: false
-                        )
+                    settingsFieldSection(title: "settings.category.field".localized) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            PKFieldContainer {
+                                TextField(text: $viewModel.customCategoryName, prompt: Text("settings.category.placeholder".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
+                                    .textFieldStyle(.plain)
+                                    .font(.system(size: 14, weight: .medium))
+                            }
+
+                            HStack(spacing: AppSpacing.sm) {
+                                Button(viewModel.editingCategoryId == nil ? "settings.category.add".localized : "settings.category.save".localized) {
+                                    viewModel.saveCustomCategory()
+                                    Task { await onCategoriesChanged?() }
+                                }
+                                .buttonStyle(PrimaryButtonStyle())
+
+                                if viewModel.editingCategoryId != nil {
+                                    Button("settings.category.cancel".localized) {
+                                        viewModel.cancelCategoryEditing()
+                                    }
+                                    .buttonStyle(DetailActionButtonStyle())
+                                }
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(viewModel.customCategories) { category in
+                            HStack(spacing: 12) {
+                                PKFieldContainer {
+                                    Text(category.name)
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(AppColors.foreground)
+                                }
+                                Button("settings.category.edit".localized) {
+                                    viewModel.beginEditingCategory(category)
+                                }
+                                .buttonStyle(DetailActionButtonStyle())
+
+                                Button("settings.category.delete".localized) {
+                                    viewModel.deleteCustomCategory(category)
+                                    Task { await onCategoriesChanged?() }
+                                }
+                                .buttonStyle(DestructiveButtonStyle())
+                            }
+                        }
                     }
                 }
 
@@ -144,9 +183,7 @@ struct SettingsViewNew: View {
                                     .font(.caption)
                                     .foregroundColor(AppColors.mutedForeground)
                             }
-
                             Spacer(minLength: 0)
-
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 13, weight: .semibold))
                                 .foregroundColor(AppColors.mutedForeground)
@@ -168,8 +205,6 @@ struct SettingsViewNew: View {
         }
     }
 
-    // MARK: - Reset Password
-
     private var resetPasswordContent: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -184,7 +219,6 @@ struct SettingsViewNew: View {
                             .font(.system(size: 14, weight: .medium))
                     }
                 }
-
                 settingsFieldSection(title: "settings.newPassword".localized) {
                     PKFieldContainer {
                         SecureField(text: $newPassword, prompt: Text("settings.placeholder.newPassword".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
@@ -192,7 +226,6 @@ struct SettingsViewNew: View {
                             .font(.system(size: 14, weight: .medium))
                     }
                 }
-
                 settingsFieldSection(title: "settings.confirmPassword".localized) {
                     PKFieldContainer {
                         SecureField(text: $confirmPassword, prompt: Text("settings.placeholder.confirmPassword".localized).foregroundColor(AppColors.mutedForeground.opacity(0.5))) { }
@@ -206,8 +239,6 @@ struct SettingsViewNew: View {
         }
     }
 
-    // MARK: - Shared Layout Helpers
-
     private func settingsSection<Rows: View>(title: String, @ViewBuilder rows: () -> Rows) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             Text(title)
@@ -216,9 +247,7 @@ struct SettingsViewNew: View {
                 .foregroundColor(AppColors.mutedForeground)
 
             PKMetadataPanel {
-                VStack(alignment: .leading, spacing: 14) {
-                    rows()
-                }
+                VStack(alignment: .leading, spacing: 14) { rows() }
             }
         }
     }
@@ -229,7 +258,6 @@ struct SettingsViewNew: View {
                 .font(.system(size: 12, weight: .semibold))
                 .tracking(0.2)
                 .foregroundColor(AppColors.mutedForeground)
-
             content()
         }
     }
@@ -249,8 +277,6 @@ struct SettingsViewNew: View {
             )
     }
 
-    // MARK: - Actions
-
     private func clearResetFeedback() {
         viewModel.passwordResetError = nil
         viewModel.passwordResetSuccess = false
@@ -261,11 +287,7 @@ struct SettingsViewNew: View {
         isResetting = true
         defer { isResetting = false }
 
-        let success = await viewModel.resetPassword(
-            currentPassword: currentPassword,
-            newPassword: newPassword
-        )
-
+        let success = await viewModel.resetPassword(currentPassword: currentPassword, newPassword: newPassword)
         if success {
             currentPassword = ""
             newPassword = ""
@@ -274,10 +296,7 @@ struct SettingsViewNew: View {
     }
 
     private var isResetValid: Bool {
-        !currentPassword.isEmpty &&
-        !newPassword.isEmpty &&
-        newPassword == confirmPassword &&
-        newPassword.count >= 6
+        !currentPassword.isEmpty && !newPassword.isEmpty && newPassword == confirmPassword && newPassword.count >= 6
     }
 
     private var feedbackMessage: (message: String, color: Color)? {
@@ -292,6 +311,16 @@ struct SettingsViewNew: View {
         }
         return nil
     }
+
+    private var categoryFeedbackMessage: (message: String, color: Color)? {
+        if let error = viewModel.categoryErrorMessage, !error.isEmpty {
+            return (error, AppColors.destructive)
+        }
+        if let success = viewModel.categorySuccessMessage, !success.isEmpty {
+            return (success, AppColors.primary)
+        }
+        return nil
+    }
 }
 
 private enum SettingsModalRoute {
@@ -300,10 +329,8 @@ private enum SettingsModalRoute {
 
     var title: String {
         switch self {
-        case .general:
-            return "settings.title".localized
-        case .resetPassword:
-            return "settings.resetPassword".localized
+        case .general: return "settings.title".localized
+        case .resetPassword: return "settings.resetPassword".localized
         }
     }
 }

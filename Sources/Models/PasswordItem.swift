@@ -7,6 +7,8 @@ struct PasswordItem: Identifiable, Codable, Equatable {
     var title: String
     var username: String
     var encryptedPassword: Data
+    var phoneNumber: String
+    var email: String
     var notes: String
     var createdAt: Date
     var updatedAt: Date
@@ -18,6 +20,8 @@ struct PasswordItem: Identifiable, Codable, Equatable {
         title: String,
         username: String,
         encryptedPassword: Data,
+        phoneNumber: String = "",
+        email: String = "",
         notes: String = "",
         createdAt: Date = Date(),
         updatedAt: Date = Date(),
@@ -28,16 +32,26 @@ struct PasswordItem: Identifiable, Codable, Equatable {
         self.title = title
         self.username = username
         self.encryptedPassword = encryptedPassword
+        self.phoneNumber = phoneNumber
+        self.email = email
         self.notes = notes
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.searchIndex = searchIndex
     }
 
-    /// Creates search index from title and username
-    static func createSearchIndex(title: String, username: String) -> [String] {
-        let combined = "\(title.lowercased()) \(username.lowercased())"
-        return [title.lowercased(), username.lowercased(), combined]
+    /// Creates search index from title, username, phone number, and email
+    static func createSearchIndex(
+        title: String,
+        username: String,
+        phoneNumber: String = "",
+        email: String = ""
+    ) -> [String] {
+        let values = [title, username, phoneNumber, email]
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
+            .filter { !$0.isEmpty }
+        guard !values.isEmpty else { return [] }
+        return values + [values.joined(separator: " ")]
     }
 }
 
@@ -48,6 +62,8 @@ struct DecryptedPasswordItem: Identifiable, Equatable {
     var title: String
     var username: String
     var password: String
+    var phoneNumber: String
+    var email: String
     var notes: String
     var createdAt: Date
     var updatedAt: Date
@@ -58,6 +74,8 @@ struct DecryptedPasswordItem: Identifiable, Equatable {
         self.title = item.title
         self.username = item.username
         self.password = password
+        self.phoneNumber = item.phoneNumber
+        self.email = item.email
         self.notes = item.notes
         self.createdAt = item.createdAt
         self.updatedAt = item.updatedAt
@@ -69,6 +87,8 @@ struct DecryptedPasswordItem: Identifiable, Equatable {
         title: String,
         username: String,
         password: String,
+        phoneNumber: String = "",
+        email: String = "",
         notes: String = "",
         createdAt: Date = Date(),
         updatedAt: Date = Date()
@@ -78,6 +98,8 @@ struct DecryptedPasswordItem: Identifiable, Equatable {
         self.title = title
         self.username = username
         self.password = password
+        self.phoneNumber = phoneNumber
+        self.email = email
         self.notes = notes
         self.createdAt = createdAt
         self.updatedAt = updatedAt

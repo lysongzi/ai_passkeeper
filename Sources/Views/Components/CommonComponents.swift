@@ -248,14 +248,14 @@ struct TogglePasswordButton: View {
 /// Get SF Symbol for category
 func categoryIcon(for category: String) -> String {
     switch category {
-    case "category.all".localized: return "tray.full"
-    case "category.general".localized: return "key"
-    case "category.social".localized: return "person.2"
-    case "category.work".localized: return "briefcase"
-    case "category.finance".localized: return "creditcard"
-    case "category.shopping".localized: return "cart"
-    case "category.entertainment".localized: return "tv"
-    case "category.other".localized: return "folder"
+    case "category.all".localized, "All": return "tray.full"
+    case "category.general".localized, "General": return "key"
+    case "category.social".localized, "Social": return "person.2"
+    case "category.work".localized, "Work": return "briefcase"
+    case "category.finance".localized, "Finance": return "creditcard"
+    case "category.shopping".localized, "Shopping": return "cart"
+    case "category.entertainment".localized, "Entertainment": return "tv"
+    case "category.other".localized, "Other": return "folder"
     default: return "folder"
     }
 }

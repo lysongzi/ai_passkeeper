@@ -26,30 +26,24 @@ struct MainView: View {
             MainContentView(
                 viewModel: listViewModel,
                 selectedPasswordId: $selectedPasswordId,
-                onAddNew: {
-                    showingAddSheet = true
-                },
-                onSettings: {
-                    showingSettings = true
-                },
-                onLock: {
-                    appState.lock()
-                }
+                onAddNew: { showingAddSheet = true },
+                onSettings: { showingSettings = true },
+                onLock: { appState.lock() }
             )
         }
         .sheet(isPresented: $showingSettings) {
-            SettingsViewNew()
-                .environmentObject(i18nService)
+            SettingsViewNew(onCategoriesChanged: {
+                await listViewModel.refreshCategoriesAndPasswords()
+            })
+            .environmentObject(i18nService)
         }
         .sheet(isPresented: $showingAddSheet) {
             AddEditPasswordViewNew(onSave: {
-                Task {
-                    await listViewModel.loadPasswords()
-                }
+                Task { await listViewModel.refreshCategoriesAndPasswords() }
             })
         }
         .task {
-            await listViewModel.loadPasswords()
+            await listViewModel.refreshCategoriesAndPasswords()
             if selectedPasswordId == nil {
                 selectedPasswordId = listViewModel.passwords.first?.id
             }
