@@ -18,3 +18,4 @@ Podfile.lock
 # Prototype & Design
 RedesignUI/
 prototype-screenshots/
+.worktrees/
